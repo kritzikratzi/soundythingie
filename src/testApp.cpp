@@ -34,14 +34,16 @@ void testApp::setup(){
 	pan					= 0.5f;
 	bNoise 				= false;
 
-	ofSoundStreamSetup(2,0,this, sampleRate,512, 4);
-	PP.setup( &PR ); 
-	
+	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 } 
 
 //--------------------------------------------------------------
 void testApp::update(){
-	PP.update(); 
+	for( int i = 0; i < 100; i++ ){
+		if( !players[i].suicide ){
+			players[i].update(); 
+		}
+	}
 	
 	// figure out how much time elapsed from frame to frame:
 	float diffTime		= ofGetElapsedTimef() - timeOfLastFrame;
@@ -77,6 +79,7 @@ void testApp::draw(){
 	ofSetColor( 255, 255, 255 );
 	for( int i = 0; i < 5; i++ ){
 		if( ( ofGetFrameNum() % (32<<i) ) == 0 ){
+			if( i == 1 ){ pairUpWithAnyPlayer( PR ); }
 			triggerAlpha[i] = 1; 
 		}
 		
@@ -85,12 +88,28 @@ void testApp::draw(){
 		triggerAlpha[i] -= triggerAlpha[i]/10; 
 	}
 	
-
+	for( int i = 0; i < 100; i++ ){
+		if( !players[i].suicide ){
+			players[i].draw(); 
+		}
+	}
+	
 }
 
 void testApp::drawPR( pointRecorder pr ){
 	pr.draw();
-	PP.draw(); 
+}
+	
+void testApp::pairUpWithAnyPlayer( pointRecorder pr ){
+	for( int i = 0; i < 100; i++ ){
+		if( players[i].suicide ){
+			players[i].setup( &PR ); 
+			cout << "found " << i << endl; 
+			return; 
+		}
+	}
+	
+	cout << "there's toooo much going on. i can't focus. aaaaah!" << endl; 
 }
 
 
@@ -148,8 +167,9 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 		output[i*nChannels + 1] = 0; 
 	}
 	
-	
-	PP.audioRequested( output, bufferSize, nChannels ); 
-	
+	for( int i = 0; i < 100; i++ ){
+		if( !players[i].suicide ){
+			players[i].audioRequested( output, bufferSize, nChannels ); 
+		}
+	}
 }
-

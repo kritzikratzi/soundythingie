@@ -23,6 +23,7 @@ class testApp : public ofSimpleApp{
 		void mouseDragged(int x, int y, int button);
 		void mousePressed(int x, int y, int button);
 		void mouseReleased();
+		void pairUpWithAnyPlayer( pointRecorder pr ); 
 	
 		vector<pointRecorder> recorders;
 		float triggerAlpha[5]; 
@@ -49,6 +50,8 @@ class testApp : public ofSimpleApp{
 		float 	phase;
 		float 	phaseAdder;
 		float 	phaseAdderTarget;
+	
+		pointPlayer players[100];
 };
 
 #endif

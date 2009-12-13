@@ -9,13 +9,24 @@
 
 #include "pointPlayer.h"
 
+int pointPlayer::idCount = 0;
+
+
+pointPlayer::pointPlayer(){
+	id = idCount; 
+	idCount++; 
+	
+	suicide = true; 
+}
 
 void pointPlayer::setup( pointRecorder * pr ){
 	this->pr = pr; 
 	volume				= 0.1f;
 	pan					= 0.5f;
 	sampleRate 			= 44100;
+	timeCounter			= 0; 
 	suicide				= false; 
+	timeOfLastFrame		= ofGetElapsedTimef(); 
 }
 
 
@@ -26,12 +37,12 @@ void pointPlayer::update(){
 	timeOfLastFrame		= ofGetElapsedTimef(); 
 	timeCounter			+= diffTime;
 	
-	cout << this->pr->getDuration() << "---" << timeCounter << endl ; 
-	
+	//cout << this->pr->bAmRecording << "--" << this->pr->pts.size() << "--" << timeCounter << "--" << this->pr->getDuration() << endl; 
 	if (this->pr->bAmRecording == false && this->pr->pts.size() > 1){
 		if( timeCounter >= this->pr->getDuration() ){
 			// kill myself! 
 			suicide = true; 
+			cout << id << ": DIE BECAUSE OF AGE! [" << timeCounter << "]" << endl; 
 		}
 		else{
 			ofPoint vel = this->pr->getVelocityForTime(timeCounter);
@@ -49,6 +60,8 @@ void pointPlayer::update(){
 		}
 	}
 	else{
+		cout << id << ": DIE BECAUSE OF UNEMPLOYMENT!" << endl; 
+		suicide = true; 
 		volume = 0;
 		targetFrequency = 100;
 		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;

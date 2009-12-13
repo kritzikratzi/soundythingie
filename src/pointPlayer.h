@@ -7,6 +7,7 @@
 
 class pointPlayer{
 	public: 
+		pointPlayer(); 
 		void setup( pointRecorder * pr ); 
 		void draw(); 
 		void update(); 
@@ -27,6 +28,8 @@ class pointPlayer{
 		float 	sampleRate;
 	
 		bool	suicide; 
+		static int idCount; 
+		int id; 
 };
 
 #endif
