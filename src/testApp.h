@@ -5,6 +5,7 @@
 //#include "ofAddons.h"
 
 #include "pointRecorder.h"
+#include "pointPlayer.h" 
 
 class testApp : public ofSimpleApp{
 
@@ -13,7 +14,8 @@ class testApp : public ofSimpleApp{
 		void setup();
 		void update();
 		void draw();
-
+		void drawPR( pointRecorder pr ); 
+	
 		void keyPressed  (int key);
 		void keyReleased (int key);
 
@@ -22,7 +24,11 @@ class testApp : public ofSimpleApp{
 		void mousePressed(int x, int y, int button);
 		void mouseReleased();
 	
+		vector<pointRecorder> recorders;
+		float triggerAlpha[5]; 
 		pointRecorder	PR;
+		pointPlayer     PP;
+	
 		float			timeCounter;
 		float			timeOfLastFrame;
 	

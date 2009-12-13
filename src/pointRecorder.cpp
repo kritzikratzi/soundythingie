@@ -23,7 +23,7 @@ void pointRecorder::draw() {
 	// (b) draw the line: 
 	if (bAmRecording)		ofSetColor(255,255,0);
 	else					ofSetColor(80,80,80);
-		
+	
 	ofNoFill();
 	ofBeginShape();
 	for (int i = 0; i < pts.size(); i++){

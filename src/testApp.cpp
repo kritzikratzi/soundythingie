@@ -35,12 +35,14 @@ void testApp::setup(){
 	bNoise 				= false;
 
 	ofSoundStreamSetup(2,0,this, sampleRate,512, 4);
+	PP.setup( &PR ); 
 	
 } 
 
 //--------------------------------------------------------------
 void testApp::update(){
-
+	PP.update(); 
+	
 	// figure out how much time elapsed from frame to frame:
 	float diffTime		= ofGetElapsedTimef() - timeOfLastFrame;
 	timeOfLastFrame		= ofGetElapsedTimef(); 
@@ -60,7 +62,8 @@ void testApp::update(){
 		float heightPct = ((height-pt.y) / height);
 		targetFrequency = 1000.0f * heightPct;
 		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
-	} else {
+	}
+	else {
 		volume = 0;
 		targetFrequency = 100;
 		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
@@ -69,32 +72,27 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	drawPR( PR ); 
 	
-	
-	PR.draw();
-	
-	ofSetColor(255,255,255);
-	ofFill();
-	ofSetRectMode(OF_RECTMODE_CENTER);
-	// if we are not recording, get the point for a given time: 
-	if (PR.bAmRecording == false && PR.pts.size() > 1){
+	ofSetColor( 255, 255, 255 );
+	for( int i = 0; i < 5; i++ ){
+		if( ( ofGetFrameNum() % (32<<i) ) == 0 ){
+			triggerAlpha[i] = 1; 
+		}
 		
-		ofPoint vel = PR.getVelocityForTime(timeCounter);
-		ofPoint pt = PR.getPointForTime(timeCounter);
-		
-		float lengthOfVel = sqrt(vel.x * vel.x + vel.y * vel.y);
-		//if (lengthOfVel > 20 ) cout << "vel length = " << lengthOfVel << endl;
-		float angle = atan2(vel.y, vel.x);
-		
-		glPushMatrix();
-		glTranslatef(pt.x, pt.y, 0);
-		glRotatef(angle * RAD_TO_DEG, 0,0,1);
-		ofRect(0,0, 3 + lengthOfVel , 10 + lengthOfVel/3);
-		glPopMatrix();
-		
+		ofSetColor( 255*triggerAlpha[i], 255*triggerAlpha[i], 255*triggerAlpha[i] ); 
+		ofRect( 50, i*30 + 50, 20, 20 ); 
+		triggerAlpha[i] -= triggerAlpha[i]/10; 
 	}
-		
+	
+
 }
+
+void testApp::drawPR( pointRecorder pr ){
+	pr.draw();
+	PP.draw(); 
+}
+
 
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
@@ -106,7 +104,6 @@ void testApp::keyReleased  (int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-		
 }
 
 //--------------------------------------------------------------
@@ -143,12 +140,16 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 	phaseAdder = 0.95f * phaseAdder + 0.05f * phaseAdderTarget;
 	
 	for (int i = 0; i < bufferSize; i++){
-			phase += phaseAdder;
-			float sample = sin(phase);
-			output[i*nChannels    ] = sample * volume * leftScale;
-			output[i*nChannels + 1] = sample * volume * rightScale;
-		}
+			//phase += phaseAdder;
+			//float sample = sin(phase);
+		//output[i*nChannels    ] = sample * volume * leftScale;
+		//output[i*nChannels + 1] = sample * volume * rightScale;
+		output[i*nChannels    ] = 0; 
+		output[i*nChannels + 1] = 0; 
+	}
 	
+	
+	PP.audioRequested( output, bufferSize, nChannels ); 
 	
 }
 
