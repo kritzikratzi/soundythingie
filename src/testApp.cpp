@@ -51,9 +51,9 @@ void testApp::update(){
 	timeCounter			+= diffTime;
 	
 	
-	if (PR.bAmRecording == false && PR.pts.size() > 1){
-		ofPoint vel = PR.getVelocityForTime(timeCounter);
-		ofPoint pt = PR.getPointForTime(timeCounter);
+	if (recorders[whichRecorder].bAmRecording == false && recorders[whichRecorder].pts.size() > 1){
+		ofPoint vel = recorders[whichRecorder].getVelocityForTime(timeCounter);
+		ofPoint pt = recorders[whichRecorder].getPointForTime(timeCounter);
 		
 		float lengthOfVel = sqrt(vel.x * vel.x + vel.y * vel.y);
 		if (lengthOfVel > 40) lengthOfVel = 40;
@@ -74,12 +74,23 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	drawPR( PR ); 
+	for( int i = 0; i < 100; i++ ){
+		if( recorders[i].startTime != 0 ){
+			recorders[i].draw(); 
+		}
+	}
+	
 	
 	ofSetColor( 255, 255, 255 );
 	for( int i = 0; i < 5; i++ ){
 		if( ( ofGetFrameNum() % (32<<i) ) == 0 ){
-			if( i == 1 ){ pairUpWithAnyPlayer( PR ); }
+			if( i == 1 ){
+				for( int j = 0; j < 100; j++ ){
+					if( recorders[j].startTime != 0 ){
+						pairUpWithAnyPlayer( &recorders[j] ); 
+					}
+				}
+			}
 			triggerAlpha[i] = 1; 
 		}
 		
@@ -96,14 +107,10 @@ void testApp::draw(){
 	
 }
 
-void testApp::drawPR( pointRecorder pr ){
-	pr.draw();
-}
-	
-void testApp::pairUpWithAnyPlayer( pointRecorder pr ){
+void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 	for( int i = 0; i < 100; i++ ){
 		if( players[i].suicide ){
-			players[i].setup( &PR ); 
+			players[i].setup( pr ); 
 			cout << "found " << i << endl; 
 			return; 
 		}
@@ -127,19 +134,32 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-	PR.addPoint( ofPoint(x,y,0) );
+	recorders[whichRecorder].addPoint( ofPoint(x,y,0) );
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-	PR.bAmRecording = true;
-	PR.clear();
+	for( int i = 0; i < 100; i++ ){
+		if( recorders[i].startTime == 0 ){
+			whichRecorder = i; 
+			recorders[whichRecorder].bAmRecording = true;
+			recorders[whichRecorder].clear();
+			
+			return; 
+		}
+	}
+
+	
+	// NONE??? 
+	whichRecorder = 0; 
+	recorders[whichRecorder].bAmRecording = true;
+	recorders[whichRecorder].clear();
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
-	PR.addPoint( ofPoint(mouseX, mouseY,0) );
-	PR.bAmRecording = false;
+	recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
+	recorders[whichRecorder].bAmRecording = false;
 	timeCounter = 0;
 }
 
