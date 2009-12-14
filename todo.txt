@@ -17,3 +17,5 @@ TODO:
 - ability to save/load
 + ability to clear out everything
 - show proper octaves and notes (c d e f g... ) super-light as an orientation. 
+- build method into it so people can easily export audio/video? 
+  nah... just use snapz! 

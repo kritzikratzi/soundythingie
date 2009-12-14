@@ -245,6 +245,7 @@ void testApp::mousePressed(int x, int y, int button){
 			recorders[whichRecorder].clear();
 			recorders[whichRecorder].beatMod = this->beatMod; 
 			recorders[whichRecorder].volume = 0.1f; 
+			//recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
 			
 			return; 
 		}
@@ -258,7 +259,7 @@ void testApp::mousePressed(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
 	if( whichRecorder >= 0 ){
-		if( recorders[whichRecorder].pts.size() > 0 ){
+		if( recorders[whichRecorder].pts.size() >= 1 ){
 			recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
 			recorders[whichRecorder].bAmRecording = false;
 		}
