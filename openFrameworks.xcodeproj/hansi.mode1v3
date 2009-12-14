@@ -216,7 +216,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>BA71421210D5668C00CADA12</string>
+						<string>BA7142AD10D5C6CA00CADA12</string>
 						<key>history</key>
 						<array>
 							<string>BA71407E10D5495500CADA12</string>
@@ -366,16 +366,16 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>BA71421110D5668C00CADA12</string>
+										<string>BA7142AC10D5C6CA00CADA12</string>
 										<key>history</key>
 										<array>
-											<string>BA7141E010D5639400CADA12</string>
-											<string>BA7141E510D5646900CADA12</string>
-											<string>BA7141F810D5660500CADA12</string>
 											<string>BA7141F910D5660500CADA12</string>
-											<string>BA7141FB10D5660500CADA12</string>
-											<string>BA71420610D5666200CADA12</string>
-											<string>BA71420710D5666200CADA12</string>
+											<string>BA71423010D5C33C00CADA12</string>
+											<string>BA71423810D5C38200CADA12</string>
+											<string>BA71426810D5C51500CADA12</string>
+											<string>BA71426910D5C51500CADA12</string>
+											<string>BA71426A10D5C51500CADA12</string>
+											<string>BA71426B10D5C51500CADA12</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -573,14 +573,14 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>BA71421310D5668C00CADA12</string>
+		<string>BA7142AE10D5C6CA00CADA12</string>
 		<string>BA7140A410D549F200CADA12</string>
 		<string>BA7140A510D549F200CADA12</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>BA713FF810D46EC300CADA12</string>
 		<string>BA713F6910D4157600CADA12</string>
-		<string>/Users/hansi/Documents/Uni/2009 Sommer/OpenFrameworks/OF_0.06/apps/fabrica/3-soundythingie/openFrameworks.xcodeproj</string>
 		<string>1C78EAAD065D492600B07095</string>
+		<string>/Users/hansi/Documents/Uni/2009 Sommer/OpenFrameworks/OF_0.06/apps/fabrica/3-soundythingie/openFrameworks.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>0 59 1440 819 0 0 1440 878 </string>

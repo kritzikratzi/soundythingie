@@ -16,8 +16,8 @@ void pointRecorder::draw() {
 	// get the number of points and the time of the last point:
 	int nPts = pts.size();
 	float totalDuration = getDuration();
-	string report = "nPts = " + ofToString(nPts) + "\ntotal time = " + ofToString(totalDuration, 3);
-	ofDrawBitmapString(report, 10, 10);
+	//string report = "nPts = " + ofToString(nPts) + "\ntotal time = " + ofToString(totalDuration, 3);
+	//ofDrawBitmapString(report, 10, 10);
 	
 	//---------------------------
 	// (b) draw the line: 
@@ -29,7 +29,14 @@ void pointRecorder::draw() {
 	for (int i = 0; i < pts.size(); i++){
 		ofVertex(pts[i].pos.x, pts[i].pos.y);
 	}
+	
 	ofEndShape(false);
+	
+	if( pts.size() > 1 ){
+		ofFill(); 
+		ofCircle( pts[0].pos.x, pts[0].pos.y, 3 ); 
+	}
+	
 	
 }
 

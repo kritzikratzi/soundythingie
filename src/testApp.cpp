@@ -35,6 +35,8 @@ void testApp::setup(){
 	bNoise 				= false;
 
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
+	lineToDelete = -1; 
+	
 } 
 
 //--------------------------------------------------------------
@@ -80,8 +82,9 @@ void testApp::draw(){
 		}
 	}
 	
-	
+	ofSetRectMode(OF_RECTMODE_CORNER);	
 	ofSetColor( 255, 255, 255 );
+	ofFill(); 
 	for( int i = 0; i < 5; i++ ){
 		if( ( ofGetFrameNum() % (32<<i) ) == 0 ){
 			if( i == 1 ){
@@ -94,9 +97,12 @@ void testApp::draw(){
 			triggerAlpha[i] = 1; 
 		}
 		
-		ofSetColor( 255*triggerAlpha[i], 255*triggerAlpha[i], 255*triggerAlpha[i] ); 
-		ofRect( 50, i*30 + 50, 20, 20 ); 
-		triggerAlpha[i] -= triggerAlpha[i]/10; 
+		ofSetColor( 50*triggerAlpha[i], 50*triggerAlpha[i], 50*triggerAlpha[i] ); 
+		ofRect( 5+i*30, 5, 20, 20 ); 
+		ofSetColor( 150, 150, 150 ); 
+		ofDrawBitmapString( ofToString( i+1, 0 ), 11+i*30, 18 );
+		
+		triggerAlpha[i] -= triggerAlpha[i]/30.; 
 	}
 	
 	for( int i = 0; i < 100; i++ ){
@@ -105,6 +111,9 @@ void testApp::draw(){
 		}
 	}
 	
+	
+	//string report = "nPts = " + ofToString(nPts) + "\ntotal time = " + ofToString(totalDuration, 3);
+	//ofDrawBitmapString(report, 10, 10);
 }
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
@@ -130,6 +139,10 @@ void testApp::keyReleased  (int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
+	// are we really really close to a line? 
+	for( int i = 0; i < 100; i++ ){
+		
+	}
 }
 
 //--------------------------------------------------------------

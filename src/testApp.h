@@ -52,6 +52,9 @@ class testApp : public ofSimpleApp{
 	
 		int whichRecorder; 
 	
+	
+		int lineToDelete; 
+	
 };
 
 #endif
