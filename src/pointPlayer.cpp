@@ -41,9 +41,15 @@ void pointPlayer::update(){
 	//cout << this->pr->bAmRecording << "--" << this->pr->pts.size() << "--" << timeCounter << "--" << this->pr->getDuration() << endl; 
 	if (this->pr->bAmRecording == false && this->pr->pts.size() > 1){
 		if( timeCounter >= this->pr->getDuration() ){
-			// kill myself! 
-			suicide = true; 
-			cout << id << ": DIE BECAUSE OF AGE! [" << timeCounter << "]" << endl; 
+			// kill myself? 
+			if( this->pr->beatMod == 0 && this->pr->startTime != 0 ){
+				// reboot, beatless shit! 
+				timeCounter = 0; 
+			}
+			else{
+				suicide = true; 
+				cout << id << ": DIE BECAUSE OF AGE! [" << timeCounter << "]" << endl; 
+			}
 		}
 		else{
 			ofPoint vel = this->pr->getVelocityForTime(timeCounter);

@@ -25,7 +25,7 @@ class testApp : public ofSimpleApp{
 		void pairUpWithAnyPlayer( pointRecorder * pr ); 
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
 	
-		float triggerAlpha[5]; 
+		float triggerAlpha[6]; 
 	
 		float			timeCounter;
 		float			timeOfLastFrame;

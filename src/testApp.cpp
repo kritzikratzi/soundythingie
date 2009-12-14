@@ -78,16 +78,16 @@ void testApp::update(){
 	
 	// trigger players! 
 	for( int i = 0; i < 100; i++ ){
-		if( recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
+		if( recorders[i].beatMod != 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
 			pairUpWithAnyPlayer( &recorders[i] ); 
 		}
 	}
 	
 	// trigger-fade-effect for the beat-mod selectors (no one understands what i mean, right?) 
-	for( int i = 0; i < 5; i++ ){
+	for( int i = 1; i < 6; i++ ){
 		triggerAlpha[i] -= triggerAlpha[i]/30.; 
 		
-		if( ofGetFrameNum() % (32<<i) == 0 ){
+		if( ofGetFrameNum() % (16<<i) == 0 ){
 			triggerAlpha[i] = 1; 
 		}
 	}
@@ -105,8 +105,8 @@ void testApp::draw(){
 	ofSetColor( 255, 255, 255 );
 	ofFill(); 
 	
-	for( int i = 0; i < 5; i++ ){
-		if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) || (32<<i) == beatMod ){
+	for( int i = 0; i < 6; i++ ){
+		if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) || (16<<i) == beatMod ){
 			ofSetColor( 50+205*triggerAlpha[i], 0, 0 ); 
 		}
 		else{
@@ -114,7 +114,7 @@ void testApp::draw(){
 		}
 		ofRect( 5+i*30, 5, 20, 20 ); 
 		ofSetColor( 150, 150, 150 ); 
-		ofDrawBitmapString( ofToString( i+1, 0 ), 11+i*30, 19 );
+		ofDrawBitmapString( ofToString( i, 0 ), 11+i*30, 19 );
 	}
 	
 	for( int i = 0; i < 100; i++ ){
@@ -153,6 +153,9 @@ void testApp::keyPressed  (int key){
 	// set beat-mod using the keyboard
 	if( key >= '1' && key <= '5' ){
 		beatMod = 32<<(key-'1'); 
+	}
+	else if( key == '0' ){
+		beatMod = 0; 
 	}
 	
 	if( key == 'c' ){
@@ -219,9 +222,14 @@ void testApp::mousePressed(int x, int y, int button){
 	// no mouse-thingie whatsover when hovering over the controls
 	if( mouseX <= 150 && mouseY <= 30 ){
 		
-		for( int i = 0; i < 5; i++ ){
+		for( int i = 0; i < 6; i++ ){
 			if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) ){
-				beatMod = 32 << i; 
+				if( i == 0 ){
+					beatMod = 0; 
+				}
+				else{
+					beatMod = 16 << i; 
+				}
 				return; 
 			}
 		}
@@ -262,6 +270,10 @@ void testApp::mouseReleased(){
 		if( recorders[whichRecorder].pts.size() >= 1 ){
 			recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
 			recorders[whichRecorder].bAmRecording = false;
+			
+			if( recorders[whichRecorder].beatMod == 0 ){
+				pairUpWithAnyPlayer( &recorders[whichRecorder] ); 
+			}
 		}
 		else{
 			recorders[whichRecorder].clear();
