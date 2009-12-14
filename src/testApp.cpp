@@ -114,6 +114,12 @@ void testApp::draw(){
 	
 	//string report = "nPts = " + ofToString(nPts) + "\ntotal time = " + ofToString(totalDuration, 3);
 	//ofDrawBitmapString(report, 10, 10);
+	
+	if( lineToDelete >= 0 ){
+		ofFill(); 
+		ofSetColor( 255, 0, 0 ); 
+		ofCircle( recorders[lineToDelete].pts[0].pos.x, recorders[lineToDelete].pts[0].pos.y, 6 ); 
+	}
 }
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
@@ -139,9 +145,22 @@ void testApp::keyReleased  (int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
+	lineToDelete = -1; 
+	
 	// are we really really close to a line? 
-	for( int i = 0; i < 100; i++ ){
-		
+	if( whichRecorder == -1 ){
+		for( int i = 0; i < 100; i++ ){
+			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
+				// are we really close to the first point? 
+				float dx = mouseX - recorders[i].pts[0].pos.x; 
+				float dy = mouseY - recorders[i].pts[0].pos.y; 
+				
+				if( sqrt( dx*dx + dy*dy ) < 5 ){
+					lineToDelete = i; 
+					break; 
+				}
+			}
+		}
 	}
 }
 
@@ -152,6 +171,11 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+	if( lineToDelete >= 0 ){
+		recorders[lineToDelete].startTime = 0; 
+		lineToDelete = -1; 
+	}
+	
 	for( int i = 0; i < 100; i++ ){
 		if( recorders[i].startTime == 0 ){
 			whichRecorder = i; 
@@ -174,6 +198,7 @@ void testApp::mouseReleased(){
 	recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
 	recorders[whichRecorder].bAmRecording = false;
 	timeCounter = 0;
+	whichRecorder = -1; 
 }
 
 
