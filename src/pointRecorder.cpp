@@ -34,7 +34,8 @@ void pointRecorder::draw() {
 	
 	if( pts.size() > 1 ){
 		ofFill(); 
-		ofCircle( pts[0].pos.x, pts[0].pos.y, 3 ); 
+		float radius = 2+2*volume/0.1;
+		ofCircle( pts[0].pos.x, pts[0].pos.y, radius ); 
 	}
 	
 	

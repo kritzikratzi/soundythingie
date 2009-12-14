@@ -21,7 +21,8 @@ pointPlayer::pointPlayer(){
 
 void pointPlayer::setup( pointRecorder * pr ){
 	this->pr = pr; 
-	volume				= 0.1f;
+	//volume				= 0.1f;
+	volume = pr->volume; 
 	pan					= 0.5f;
 	sampleRate 			= 44100;
 	timeCounter			= 0; 

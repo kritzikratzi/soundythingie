@@ -2,9 +2,10 @@ TODO:
 
 
 + make lines deletable
-- allow changing volume (?)
++ allow changing volume (use +/- keys)
+- change volume with scroll-wheel
 + hook things up to beats
-- allow changing beats
+- allow changing beats (not important)
 - maybe, instead of changing volume the ability to 
   use a key to quickly duplicate a line
   (with some x offset, or some random position around the original, 

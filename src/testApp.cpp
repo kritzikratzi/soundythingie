@@ -130,7 +130,8 @@ void testApp::draw(){
 	if( lineToDelete >= 0 ){
 		ofFill(); 
 		ofSetColor( 255, 0, 0 ); 
-		ofCircle( recorders[lineToDelete].pts[0].pos.x, recorders[lineToDelete].pts[0].pos.y, 6 ); 
+		float radius = 2+2*recorders[lineToDelete].volume/0.1;
+		ofCircle( recorders[lineToDelete].pts[0].pos.x, recorders[lineToDelete].pts[0].pos.y, radius ); 
 	}
 }
 
@@ -160,6 +161,22 @@ void testApp::keyPressed  (int key){
 			recorders[i].startTime = 0; 
 			players[i].suicide = true; 
 		}
+	}
+	
+	
+	if( key == '-' && lineToDelete >= 0 ){
+		recorders[lineToDelete].volume -= 0.01; 
+		if( recorders[lineToDelete].volume < 0 ) recorders[lineToDelete].volume = 0; 
+	}
+
+	if( key == '+' && lineToDelete >= 0 ){
+		recorders[lineToDelete].volume += 0.01; 
+		if( recorders[lineToDelete].volume > 1 ) recorders[lineToDelete].volume = 1; 
+	}
+	
+	if( key == 'd' && lineToDelete >= 0 ){
+		// delete! 
+		mousePressed(mouseX, mouseY, 1);
 	}
 	
 }
@@ -218,6 +235,7 @@ void testApp::mousePressed(int x, int y, int button){
 	if( lineToDelete >= 0 ){
 		recorders[lineToDelete].startTime = 0; 
 		lineToDelete = -1; 
+		return; 
 	}
 	
 	for( int i = 0; i < 100; i++ ){
@@ -226,6 +244,8 @@ void testApp::mousePressed(int x, int y, int button){
 			recorders[whichRecorder].bAmRecording = true;
 			recorders[whichRecorder].clear();
 			recorders[whichRecorder].beatMod = this->beatMod; 
+			recorders[whichRecorder].volume = 0.1f; 
+			
 			return; 
 		}
 	}
