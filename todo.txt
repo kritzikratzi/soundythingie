@@ -1,0 +1,18 @@
+TODO: 
+
+
++ make lines deletable
+- allow changing volume (?)
++ hook things up to beats
+- allow changing beats
+- maybe, instead of changing volume the ability to 
+  use a key to quickly duplicate a line
+  (with some x offset, or some random position around the original, 
+   also the line could be randomized to be a bit funkier) 
++ key to delete everything 
+- something quite interresting happens when you hold down the window 
+  scaling button - should be possible to do the same thing when pressing 
+  space bar
+- ability to save/load
++ ability to clear out everything
+- show proper octaves and notes (c d e f g... ) super-light as an orientation. 

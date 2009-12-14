@@ -36,6 +36,7 @@ void testApp::setup(){
 
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	lineToDelete = -1; 
+	beatMod = 32; 
 	
 } 
 
@@ -53,7 +54,7 @@ void testApp::update(){
 	timeCounter			+= diffTime;
 	
 	
-	if (recorders[whichRecorder].bAmRecording == false && recorders[whichRecorder].pts.size() > 1){
+	if ( whichRecorder >= 0 && recorders[whichRecorder].bAmRecording == false && recorders[whichRecorder].pts.size() > 1){
 		ofPoint vel = recorders[whichRecorder].getVelocityForTime(timeCounter);
 		ofPoint pt = recorders[whichRecorder].getPointForTime(timeCounter);
 		
@@ -72,6 +73,24 @@ void testApp::update(){
 		targetFrequency = 100;
 		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
 	}
+	
+	
+	
+	// trigger players! 
+	for( int i = 0; i < 100; i++ ){
+		if( recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
+			pairUpWithAnyPlayer( &recorders[i] ); 
+		}
+	}
+	
+	// trigger-fade-effect for the beat-mod selectors (no one understands what i mean, right?) 
+	for( int i = 0; i < 5; i++ ){
+		triggerAlpha[i] -= triggerAlpha[i]/30.; 
+		
+		if( ofGetFrameNum() % (32<<i) == 0 ){
+			triggerAlpha[i] = 1; 
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -85,24 +104,17 @@ void testApp::draw(){
 	ofSetRectMode(OF_RECTMODE_CORNER);	
 	ofSetColor( 255, 255, 255 );
 	ofFill(); 
+	
 	for( int i = 0; i < 5; i++ ){
-		if( ( ofGetFrameNum() % (32<<i) ) == 0 ){
-			if( i == 1 ){
-				for( int j = 0; j < 100; j++ ){
-					if( recorders[j].startTime != 0 ){
-						pairUpWithAnyPlayer( &recorders[j] ); 
-					}
-				}
-			}
-			triggerAlpha[i] = 1; 
+		if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) || (32<<i) == beatMod ){
+			ofSetColor( 50+205*triggerAlpha[i], 0, 0 ); 
 		}
-		
-		ofSetColor( 50*triggerAlpha[i], 50*triggerAlpha[i], 50*triggerAlpha[i] ); 
+		else{
+			ofSetColor( 50*triggerAlpha[i], 50*triggerAlpha[i], 50*triggerAlpha[i] ); 
+		}
 		ofRect( 5+i*30, 5, 20, 20 ); 
 		ofSetColor( 150, 150, 150 ); 
-		ofDrawBitmapString( ofToString( i+1, 0 ), 11+i*30, 18 );
-		
-		triggerAlpha[i] -= triggerAlpha[i]/30.; 
+		ofDrawBitmapString( ofToString( i+1, 0 ), 11+i*30, 19 );
 	}
 	
 	for( int i = 0; i < 100; i++ ){
@@ -137,6 +149,19 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
+	// set beat-mod using the keyboard
+	if( key >= '1' && key <= '5' ){
+		beatMod = 32<<(key-'1'); 
+	}
+	
+	if( key == 'c' ){
+		for( int i = 0; i < 100; i++ ){
+			recorders[i].clear(); 
+			recorders[i].startTime = 0; 
+			players[i].suicide = true; 
+		}
+	}
+	
 }
 
 //--------------------------------------------------------------
@@ -146,6 +171,7 @@ void testApp::keyReleased  (int key){
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
 	lineToDelete = -1; 
+	
 	
 	// are we really really close to a line? 
 	if( whichRecorder == -1 ){
@@ -166,11 +192,29 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-	recorders[whichRecorder].addPoint( ofPoint(x,y,0) );
+	if( whichRecorder >= 0 ){
+		recorders[whichRecorder].addPoint( ofPoint(x,y,0) );
+	}
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+	// no mouse-thingie whatsover when hovering over the controls
+	if( mouseX <= 150 && mouseY <= 30 ){
+		
+		for( int i = 0; i < 5; i++ ){
+			if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) ){
+				beatMod = 32 << i; 
+				return; 
+			}
+		}
+		
+		
+		
+		return; 
+	}
+	
+	
 	if( lineToDelete >= 0 ){
 		recorders[lineToDelete].startTime = 0; 
 		lineToDelete = -1; 
@@ -181,31 +225,31 @@ void testApp::mousePressed(int x, int y, int button){
 			whichRecorder = i; 
 			recorders[whichRecorder].bAmRecording = true;
 			recorders[whichRecorder].clear();
-			
+			recorders[whichRecorder].beatMod = this->beatMod; 
 			return; 
 		}
 	}
 
 	
 	// NONE??? 
-	whichRecorder = 0; 
-	recorders[whichRecorder].bAmRecording = true;
-	recorders[whichRecorder].clear();
+	whichRecorder = -1; 
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
-	if( recorders[whichRecorder].pts.size() > 0 ){
-		recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
-		recorders[whichRecorder].bAmRecording = false;
+	if( whichRecorder >= 0 ){
+		if( recorders[whichRecorder].pts.size() > 0 ){
+			recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
+			recorders[whichRecorder].bAmRecording = false;
+		}
+		else{
+			recorders[whichRecorder].clear();
+			recorders[whichRecorder].startTime = 0; 
+		}
+		
+		timeCounter = 0;
+		whichRecorder = -1; 
 	}
-	else{
-		recorders[whichRecorder].clear();
-		recorders[whichRecorder].startTime = 0; 
-	}
-	
-	timeCounter = 0;
-	whichRecorder = -1; 
 }
 
 
@@ -237,4 +281,9 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 			players[i].audioRequested( output, bufferSize, nChannels ); 
 		}
 	}
+}
+
+// ... 
+bool testApp::inRect( float pX, float pY, float x, float y, float width, float height ){
+	return pX >= x && pX <= x + width && pY >= y && pY <= y + height; 
 }

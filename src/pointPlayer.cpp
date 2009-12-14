@@ -67,7 +67,6 @@ void pointPlayer::update(){
 		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
 		timeCounter = 0; 
 	}
-	
 }
 
 void pointPlayer::draw(){

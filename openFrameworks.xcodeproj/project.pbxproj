@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1DDD8BBF105A6467003C0985 /* pointRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1DDD8BBE105A6467003C0985 /* pointRecorder.cpp */; };
 		BA713F9E10D4195A00CADA12 /* pointPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */; };
+		BA81ECA010D6A2040073B73B /* todo.txt in Resources */ = {isa = PBXBuildFile; fileRef = BA81EC9F10D6A2040073B73B /* todo.txt */; };
 		E446644B0F5B1CFD005D0BF0 /* ofAppGlutWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E446641A0F5B1CFD005D0BF0 /* ofAppGlutWindow.cpp */; };
 		E446644C0F5B1CFD005D0BF0 /* ofAppRunner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E446641C0F5B1CFD005D0BF0 /* ofAppRunner.cpp */; };
 		E446644D0F5B1CFD005D0BF0 /* ofArduino.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E44664200F5B1CFD005D0BF0 /* ofArduino.cpp */; };
@@ -57,6 +58,7 @@
 		1DDD8BBE105A6467003C0985 /* pointRecorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pointRecorder.cpp; sourceTree = "<group>"; };
 		BA713F9C10D4195A00CADA12 /* pointPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pointPlayer.h; sourceTree = "<group>"; };
 		BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pointPlayer.cpp; sourceTree = "<group>"; };
+		BA81EC9F10D6A2040073B73B /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.txt; sourceTree = "<group>"; };
 		E44664190F5B1CFD005D0BF0 /* ofAppBaseWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofAppBaseWindow.h; path = ../../../libs/openFrameworks/app/ofAppBaseWindow.h; sourceTree = SOURCE_ROOT; };
 		E446641A0F5B1CFD005D0BF0 /* ofAppGlutWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofAppGlutWindow.cpp; path = ../../../libs/openFrameworks/app/ofAppGlutWindow.cpp; sourceTree = SOURCE_ROOT; };
 		E446641B0F5B1CFD005D0BF0 /* ofAppGlutWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofAppGlutWindow.h; path = ../../../libs/openFrameworks/app/ofAppGlutWindow.h; sourceTree = SOURCE_ROOT; };
@@ -740,6 +742,7 @@
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
 				E44664170F5B1CFD005D0BF0 /* openFrameworks */,
 				E45BE0360E8CC5DE009D7055 /* libs */,
+				BA81EC9F10D6A2040073B73B /* todo.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -802,6 +805,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4B6FCAE0C3E899E008CF71C /* openFrameworks-Info.plist in Resources */,
+				BA81ECA010D6A2040073B73B /* todo.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

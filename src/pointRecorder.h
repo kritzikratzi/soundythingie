@@ -44,6 +44,8 @@ class pointRecorder {
 	
 		bool				bAmRecording;			// we don't playback when we are recording...
 		
+		int beatMod; 
+	
 };
 
 #endif // POINT_RECORDER_H
