@@ -195,8 +195,15 @@ void testApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
-	recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
-	recorders[whichRecorder].bAmRecording = false;
+	if( recorders[whichRecorder].pts.size() > 0 ){
+		recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
+		recorders[whichRecorder].bAmRecording = false;
+	}
+	else{
+		recorders[whichRecorder].clear();
+		recorders[whichRecorder].startTime = 0; 
+	}
+	
 	timeCounter = 0;
 	whichRecorder = -1; 
 }
