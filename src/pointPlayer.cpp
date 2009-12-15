@@ -45,10 +45,12 @@ void pointPlayer::update(){
 			if( this->pr->beatMod == 0 && this->pr->startTime != 0 ){
 				// reboot, beatless shit! 
 				timeCounter = 0; 
+				// get updated volume! 
+				this->volume = this->pr->volume; 
 			}
 			else{
+				// DIE BECAUSE OF AGE! 
 				suicide = true; 
-				cout << id << ": DIE BECAUSE OF AGE! [" << timeCounter << "]" << endl; 
 			}
 		}
 		else{
@@ -67,7 +69,7 @@ void pointPlayer::update(){
 		}
 	}
 	else{
-		cout << id << ": DIE BECAUSE OF UNEMPLOYMENT!" << endl; 
+		// DIE BECAUSE OF UNEMPLOYMENT!
 		suicide = true; 
 		volume = 0;
 		targetFrequency = 100;

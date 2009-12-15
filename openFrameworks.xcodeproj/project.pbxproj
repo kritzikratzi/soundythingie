@@ -10,6 +10,7 @@
 		1DDD8BBF105A6467003C0985 /* pointRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1DDD8BBE105A6467003C0985 /* pointRecorder.cpp */; };
 		BA713F9E10D4195A00CADA12 /* pointPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */; };
 		BA81ECA010D6A2040073B73B /* todo.txt in Resources */ = {isa = PBXBuildFile; fileRef = BA81EC9F10D6A2040073B73B /* todo.txt */; };
+		BA8DF4CA10D737B300AA63B7 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BA8DF4C910D737B300AA63B7 /* icon.icns */; };
 		E446644B0F5B1CFD005D0BF0 /* ofAppGlutWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E446641A0F5B1CFD005D0BF0 /* ofAppGlutWindow.cpp */; };
 		E446644C0F5B1CFD005D0BF0 /* ofAppRunner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E446641C0F5B1CFD005D0BF0 /* ofAppRunner.cpp */; };
 		E446644D0F5B1CFD005D0BF0 /* ofArduino.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E44664200F5B1CFD005D0BF0 /* ofArduino.cpp */; };
@@ -59,6 +60,7 @@
 		BA713F9C10D4195A00CADA12 /* pointPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pointPlayer.h; sourceTree = "<group>"; };
 		BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pointPlayer.cpp; sourceTree = "<group>"; };
 		BA81EC9F10D6A2040073B73B /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.txt; sourceTree = "<group>"; };
+		BA8DF4C910D737B300AA63B7 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		E44664190F5B1CFD005D0BF0 /* ofAppBaseWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofAppBaseWindow.h; path = ../../../libs/openFrameworks/app/ofAppBaseWindow.h; sourceTree = SOURCE_ROOT; };
 		E446641A0F5B1CFD005D0BF0 /* ofAppGlutWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofAppGlutWindow.cpp; path = ../../../libs/openFrameworks/app/ofAppGlutWindow.cpp; sourceTree = SOURCE_ROOT; };
 		E446641B0F5B1CFD005D0BF0 /* ofAppGlutWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofAppGlutWindow.h; path = ../../../libs/openFrameworks/app/ofAppGlutWindow.h; sourceTree = SOURCE_ROOT; };
@@ -223,7 +225,7 @@
 		E45BEE780E8CC911009D7055 /* libPocoNet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoNet.a; path = ../../../libs/poco/lib/libPocoNet.a; sourceTree = SOURCE_ROOT; };
 		E45BEE790E8CC911009D7055 /* libPocoUtil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoUtil.a; path = ../../../libs/poco/lib/libPocoUtil.a; sourceTree = SOURCE_ROOT; };
 		E45BEE7A0E8CC911009D7055 /* libPocoXML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoXML.a; path = ../../../libs/poco/lib/libPocoXML.a; sourceTree = SOURCE_ROOT; };
-		E4B69B5B0A3A1756003C02F2 /* openFrameworksDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = openFrameworksDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4B69B5B0A3A1756003C02F2 /* SoundythingieDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoundythingieDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testApp.cpp; path = src/testApp.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1F0A3A1BDC003C02F2 /* testApp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = testApp.h; path = src/testApp.h; sourceTree = SOURCE_ROOT; };
@@ -737,7 +739,8 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
-				E4B69B5B0A3A1756003C02F2 /* openFrameworksDebug.app */,
+				BA8DF4C910D737B300AA63B7 /* icon.icns */,
+				E4B69B5B0A3A1756003C02F2 /* SoundythingieDebug.app */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
 				E44664170F5B1CFD005D0BF0 /* openFrameworks */,
@@ -778,7 +781,7 @@
 			);
 			name = openFrameworks;
 			productName = myOFApp;
-			productReference = E4B69B5B0A3A1756003C02F2 /* openFrameworksDebug.app */;
+			productReference = E4B69B5B0A3A1756003C02F2 /* SoundythingieDebug.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -806,6 +809,7 @@
 			files = (
 				E4B6FCAE0C3E899E008CF71C /* openFrameworks-Info.plist in Resources */,
 				BA81ECA010D6A2040073B73B /* todo.txt in Resources */,
+				BA8DF4CA10D737B300AA63B7 /* icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -949,7 +953,7 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_5 = "\"$(SRCROOT)/../../../libs/poco/lib\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_6 = "\"$(SRCROOT)/../../../libs/rtAudio/lib\"";
 				PREBINDING = NO;
-				PRODUCT_NAME = openFrameworksDebug;
+				PRODUCT_NAME = SoundythingieDebug;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -988,7 +992,7 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_5 = "\"$(SRCROOT)/../../../libs/poco/lib\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_6 = "\"$(SRCROOT)/../../../libs/rtAudio/lib\"";
 				PREBINDING = NO;
-				PRODUCT_NAME = openFrameworks;
+				PRODUCT_NAME = Soundythingie;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};

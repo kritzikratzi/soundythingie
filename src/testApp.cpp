@@ -8,12 +8,12 @@ void testApp::setup(){
 	// macs by default run on non vertical sync, which can make animation very, very fast
 	// this fixes that: 
 	
-	ofSetVerticalSync(true);
-	ofSetFrameRate(100);
+	ofSetVerticalSync( true );
+	ofSetFrameRate( 60 );
 	
 	// set background: 
 	
-	ofBackground(30,30,30);
+	ofBackground( 30,30,30 );
 
 	
 	timeCounter			= 0;
@@ -139,7 +139,6 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 	for( int i = 0; i < 100; i++ ){
 		if( players[i].suicide ){
 			players[i].setup( pr ); 
-			cout << "found " << i << endl; 
 			return; 
 		}
 	}
@@ -182,6 +181,15 @@ void testApp::keyPressed  (int key){
 		mousePressed(mouseX, mouseY, 1);
 	}
 	
+	if( key == 'f' ){
+		ofSetFrameRate( ofGetFrameRate()+1 ); 
+		cout << ofGetFrameRate() << endl; 
+	}	
+	
+	if( key == 's' ){
+		ofSetFrameRate( ofGetFrameRate()-1 ); 
+		cout << ofGetFrameRate() << endl; 
+	}	
 }
 
 //--------------------------------------------------------------

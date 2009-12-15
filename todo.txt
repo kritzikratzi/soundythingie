@@ -20,3 +20,7 @@ TODO:
 - build method into it so people can easily export audio/video? 
   nah... just use snapz! 
 - make the space-bar the "live" key, where the mouse-velocity is played. 
+- possibility to chose off-beats (?)
+- hold down "s" like speed - 
+  drag along x-axis to change playback-speed, 
+  drag along y-axis to change beat-speed. 
