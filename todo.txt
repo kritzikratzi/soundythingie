@@ -24,3 +24,18 @@ TODO:
 - hold down "s" like speed - 
   drag along x-axis to change playback-speed, 
   drag along y-axis to change beat-speed. 
+- use l ("link"), to link the beat directly to the generated beat, 
+  or to allow drawing on arbitrary offbeats
+- allow spawing from the middle of a line
+  --------------------------- (1)
+            \
+             \___________ (2)
+  
+  the second line copies the player from line (1) as soon as it reaches
+  the intersection. 
+- new beat selection: 
+  1, 2, 4, 8, 16
+  if none is selected you get zach's example (looping on the line)
+  if one (or more) beats are selected a player is triggered in sync with 
+  the beat (say 1+4 are selected -> trigger every 5th sample) 
+  maybe having a slider with snap-points is easier to handle! 
