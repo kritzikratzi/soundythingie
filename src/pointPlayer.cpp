@@ -34,7 +34,7 @@ void pointPlayer::setup( pointRecorder * pr ){
 void pointPlayer::update(){
 	if( suicide ) return; 
 	
-	float diffTime		= ofGetElapsedTimef() - timeOfLastFrame;
+	diffTime		= ofGetElapsedTimef() - timeOfLastFrame;
 	timeOfLastFrame		= ofGetElapsedTimef(); 
 	timeCounter			+= diffTime;
 	

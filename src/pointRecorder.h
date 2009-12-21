@@ -31,13 +31,13 @@ class pointRecorder {
         pointRecorder();
 	
 		void addPoint(ofPoint pt);
-		void clear();
 		void draw();
+		void reset( int beatMod );
 		float getDuration();
 		
 		ofPoint getPointForTime(float time);
 		ofPoint getVelocityForTime(float time);
-	
+		
 		float				startTime;
 		int					maxNumPts;
 		vector <timePt>		pts;
@@ -46,7 +46,9 @@ class pointRecorder {
 		
 		int beatMod; 
 		float volume;
-	
+		
+		vector <int> kids;
+		vector <int> kidPointNr; // at which point of the line do we attach? 
 };
 
 #endif // POINT_RECORDER_H

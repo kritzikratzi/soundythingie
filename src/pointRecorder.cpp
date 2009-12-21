@@ -65,8 +65,15 @@ void pointRecorder::addPoint(ofPoint pt) {
 }
 
 //------------------------------------------------------------------
-void pointRecorder::clear() {
-	pts.clear();
+void pointRecorder::reset( int beatMod ) {
+	this->pts.clear();
+	this->bAmRecording = true;
+	this->beatMod = beatMod; 
+	this->volume = 0.1f;
+	this->startTime = 0; 
+	
+	this->kids.clear(); 
+	this->kidPointNr.clear(); 
 }
 
 //------------------------------------------------------------------

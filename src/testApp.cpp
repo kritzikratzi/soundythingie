@@ -33,11 +33,13 @@ void testApp::setup(){
 	volume				= 0.1f;
 	pan					= 0.5f;
 	bNoise 				= false;
+	
+	spawnFocusPoint = -1; 
+	spawnFocusRecorder = -1; 
 
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	lineToDelete = -1; 
 	beatMod = 32; 
-	
 } 
 
 //--------------------------------------------------------------
@@ -78,10 +80,38 @@ void testApp::update(){
 	
 	// trigger players! 
 	for( int i = 0; i < 100; i++ ){
-		if( recorders[i].beatMod != 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
+		if( recorders[i].beatMod > 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
 			pairUpWithAnyPlayer( &recorders[i] ); 
 		}
 	}
+	
+	// trigger kids!
+	//cout << "---------------" << endl; 
+	for( int i = 0; i < 100; i++ ){
+		if( recorders[i].kids.size() > 0 ){
+			
+			pointRecorder * rec = &recorders[i]; 
+			for( int j = 0; j < rec->kids.size(); j++ ){
+				float when = rec->pts[rec->kidPointNr[j]].time; 
+				float duration = rec->pts[rec->pts.size()-1].time; 
+				double x1, x2; 
+				
+				// is there a player that JUST played this? 
+				for( int k = 0; k < 100; k++ ){
+					x2 = players[k].timeCounter; 
+					x1 = x2 - (double)players[k].diffTime; 
+					
+					if( players[k].suicide == false && players[k].pr == rec && x1 <= when && when < x2 ){
+						cout << "play line nr " << rec->kids[j] << ", kid of line nr. " << i << "; j=" << j << ", k= " << k << endl; 
+						pairUpWithAnyPlayer( &(recorders[rec->kids[j]]) ); 
+						k = 100; // "break" on the k-level
+					}
+				}
+			}
+				
+		}
+	}
+	
 	
 	// trigger-fade-effect for the beat-mod selectors (no one understands what i mean, right?) 
 	for( int i = 1; i < 6; i++ ){
@@ -133,6 +163,13 @@ void testApp::draw(){
 		float radius = 2+2*recorders[lineToDelete].volume/0.1;
 		ofCircle( recorders[lineToDelete].pts[0].pos.x, recorders[lineToDelete].pts[0].pos.y, radius ); 
 	}
+	
+	if( spawnFocusPoint >= 0 ){
+		ofNoFill(); 
+		ofSetColor( 255, 255, 0 ); 
+		ofPoint *p = &recorders[spawnFocusRecorder].pts[spawnFocusPoint].pos; 
+		ofCircle( p->x, p->y, 5 ); 
+	}
 }
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
@@ -159,9 +196,9 @@ void testApp::keyPressed  (int key){
 	
 	if( key == 'c' ){
 		for( int i = 0; i < 100; i++ ){
-			recorders[i].clear(); 
+			//recorders[i].clear(); 
 			recorders[i].startTime = 0; 
-			players[i].suicide = true; 
+			//players[i].suicide = true; 
 		}
 	}
 	
@@ -203,6 +240,7 @@ void testApp::mouseMoved(int x, int y ){
 	
 	// are we really really close to a line? 
 	if( whichRecorder == -1 ){
+		float dx, dy; 
 		for( int i = 0; i < 100; i++ ){
 			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
 				// are we really close to the first point? 
@@ -212,6 +250,31 @@ void testApp::mouseMoved(int x, int y ){
 				if( sqrt( dx*dx + dy*dy ) < 5 ){
 					lineToDelete = i; 
 					break; 
+				}
+			}
+		}
+	}
+	
+	spawnFocusPoint = -1; 
+	spawnFocusRecorder = -1; 
+	
+	if( lineToDelete == -1 && whichRecorder == -1 ){
+		float minDistance = 100; 
+		float distance = 100;
+		float dx, dy; 
+		
+		for( int i = 0; i < 100; i++ ){
+			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
+				for( int j = 0; j < recorders[i].pts.size(); j++ ){
+					// are we really close to the first point? 
+					dx = mouseX - recorders[i].pts[j].pos.x; 
+					dy = mouseY - recorders[i].pts[j].pos.y; 
+					distance = sqrt( dx*dx + dy*dy ); 
+					if( distance < 10 && distance < minDistance ){
+						minDistance = distance; 
+						spawnFocusRecorder = i; 
+						spawnFocusPoint = j; 
+					}
 				}
 			}
 		}
@@ -257,11 +320,17 @@ void testApp::mousePressed(int x, int y, int button){
 	for( int i = 0; i < 100; i++ ){
 		if( recorders[i].startTime == 0 ){
 			whichRecorder = i; 
-			recorders[whichRecorder].bAmRecording = true;
-			recorders[whichRecorder].clear();
-			recorders[whichRecorder].beatMod = this->beatMod; 
-			recorders[whichRecorder].volume = 0.1f; 
-			//recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );
+			recorders[whichRecorder].reset( this->beatMod ); 
+			
+			if( spawnFocusRecorder >= 0 ){
+				pointRecorder * rec = &recorders[spawnFocusRecorder]; 
+				rec->kids.push_back( whichRecorder ); 
+				rec->kidPointNr.push_back( spawnFocusPoint );  
+				cout << "ADDED KID!!!!" << endl; 
+				ofPoint p = rec->pts[spawnFocusPoint].pos; 
+				recorders[whichRecorder].addPoint( p );
+				recorders[whichRecorder].beatMod = -1; // this will never launch it's own players! 
+			}
 			
 			return; 
 		}
@@ -284,8 +353,7 @@ void testApp::mouseReleased(){
 			}
 		}
 		else{
-			recorders[whichRecorder].clear();
-			recorders[whichRecorder].startTime = 0; 
+			recorders[whichRecorder].reset( this->beatMod ); 
 		}
 		
 		timeCounter = 0;

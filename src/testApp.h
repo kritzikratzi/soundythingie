@@ -56,6 +56,11 @@ class testApp : public ofSimpleApp{
 	
 		int lineToDelete; 
 	
+	
+		// mouse focus? 
+		int spawnFocusRecorder; 
+		int spawnFocusPoint; 
+	
 };
 
 #endif

@@ -33,6 +33,8 @@ TODO:
   
   the second line copies the player from line (1) as soon as it reaches
   the intersection. 
+  in fact - spawning _could_ completely replace the current beat-architecture
+  and transform into a very beat-free tool. 
 - new beat selection: 
   1, 2, 4, 8, 16
   if none is selected you get zach's example (looping on the line)

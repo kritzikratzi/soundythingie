@@ -26,6 +26,7 @@ class pointPlayer{
 		float 	volume;
 		float 	pan;
 		float 	sampleRate;
+		float	diffTime; 
 	
 		bool	suicide; 
 		static int idCount; 
