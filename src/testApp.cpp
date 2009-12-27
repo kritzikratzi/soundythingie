@@ -40,6 +40,7 @@ void testApp::setup(){
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	lineToDelete = -1; 
 	beatMod = 32; 
+	useEnvelope = false; 
 } 
 
 //--------------------------------------------------------------
@@ -48,32 +49,6 @@ void testApp::update(){
 		if( !players[i].suicide ){
 			players[i].update(); 
 		}
-	}
-	
-	// figure out how much time elapsed from frame to frame:
-	float diffTime		= ofGetElapsedTimef() - timeOfLastFrame;
-	timeOfLastFrame		= ofGetElapsedTimef(); 
-	timeCounter			+= diffTime;
-	
-	
-	if ( whichRecorder >= 0 && recorders[whichRecorder].bAmRecording == false && recorders[whichRecorder].pts.size() > 1){
-		ofPoint vel = recorders[whichRecorder].getVelocityForTime(timeCounter);
-		ofPoint pt = recorders[whichRecorder].getPointForTime(timeCounter);
-		
-		float lengthOfVel = sqrt(vel.x * vel.x + vel.y * vel.y);
-		if (lengthOfVel > 40) lengthOfVel = 40;
-		volume = 0.94f * volume + 0.06f *( powf((lengthOfVel / 40.0f),2.0) * 0.5f);
-		int width = ofGetWidth();
-		pan = 0.95f * pan + 0.05f * ((float)pt.x / (float)width);
-		float height = (float)ofGetHeight();
-		float heightPct = ((height-pt.y) / height);
-		targetFrequency = 1000.0f * heightPct;
-		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
-	}
-	else {
-		volume = 0;
-		targetFrequency = 100;
-		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
 	}
 	
 	
@@ -102,7 +77,7 @@ void testApp::update(){
 					x1 = x2 - (double)players[k].diffTime; 
 					
 					if( players[k].suicide == false && players[k].pr == rec && x1 <= when && when < x2 ){
-						cout << "play line nr " << rec->kids[j] << ", kid of line nr. " << i << "; j=" << j << ", k= " << k << endl; 
+						// cout << "play line nr " << rec->kids[j] << ", kid of line nr. " << i << "; j=" << j << ", k= " << k << endl; 
 						pairUpWithAnyPlayer( &(recorders[rec->kids[j]]) ); 
 						k = 100; // "break" on the k-level
 					}
@@ -226,7 +201,12 @@ void testApp::keyPressed  (int key){
 	if( key == 's' ){
 		ofSetFrameRate( ofGetFrameRate()-1 ); 
 		cout << ofGetFrameRate() << endl; 
-	}	
+	}
+	
+	if( key == 'e' ){
+		useEnvelope = !useEnvelope; 
+		cout << "Envelope: " << useEnvelope << endl; 
+	}
 }
 
 //--------------------------------------------------------------
@@ -387,7 +367,7 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 	
 	for( int i = 0; i < 100; i++ ){
 		if( !players[i].suicide ){
-			players[i].audioRequested( output, bufferSize, nChannels ); 
+			players[i].audioRequested( output, bufferSize, nChannels, useEnvelope ); 
 		}
 	}
 }

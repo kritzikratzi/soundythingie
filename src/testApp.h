@@ -61,6 +61,7 @@ class testApp : public ofSimpleApp{
 		int spawnFocusRecorder; 
 		int spawnFocusPoint; 
 	
+		bool useEnvelope; 
 };
 
 #endif
