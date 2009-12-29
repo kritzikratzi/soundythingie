@@ -55,6 +55,8 @@ class testApp : public ofSimpleApp{
 		int beatMod; 
 	
 		int lineToDelete; 
+
+		bool  	bFullscreen;
 	
 	
 		// mouse focus? 

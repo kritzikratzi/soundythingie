@@ -14,6 +14,7 @@ void testApp::setup(){
 	// set background: 
 	
 	ofBackground( 30,30,30 );
+	bFullscreen	= false;
 
 	
 	timeCounter			= 0;
@@ -128,10 +129,12 @@ void testApp::draw(){
 		
 		ofDisableSmoothing();
 		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) || (16<<i) == beatMod || (beatMod == 0 && i == 0 ) ){
-			int r = 50+50*triggerAlpha[i];
+			int r = 70+150*triggerAlpha[i];
 			ofSetColor( r, r, r ); 
 			ofFill(); 
-			ofRect( 10, 10+i*30, 18, 18 ); 
+			//ofRect( 10, 10+i*30, 18, 18 ); 
+			ofSetColor( 0x555555 ); 
+			ofRect( 18, 18+i*30, 10, 10 ); 
 			ofNoFill(); 
 		}
 		
@@ -140,7 +143,7 @@ void testApp::draw(){
 		beatImgs[i].draw( 10, 10+i*30 );
 		ofDisableAlphaBlending();
 		
-		int r = 100+100*triggerAlpha[i];
+		int r = 120+100*triggerAlpha[i];
 		ofSetColor( r, r, r ); 
 		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
 	}
@@ -216,15 +219,12 @@ void testApp::keyPressed  (int key){
 		mousePressed(mouseX, mouseY, 1);
 	}
 	
-	if( key == 'f' ){
-		ofSetFrameRate( ofGetFrameRate()+1 ); 
-		cout << ofGetFrameRate() << endl; 
-	}	
-	
-	if( key == 's' ){
-		ofSetFrameRate( ofGetFrameRate()-1 ); 
-		cout << ofGetFrameRate() << endl; 
+	if(key == 'f'){
+		
+		bFullscreen = !bFullscreen;
+		ofSetFullscreen(bFullscreen);
 	}
+	
 	
 	if( key == 'e' ){
 		useEnvelope = !useEnvelope; 

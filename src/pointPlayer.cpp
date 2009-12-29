@@ -107,20 +107,6 @@ void pointPlayer::draw(){
 		ofRect(0,0, 3 + lengthOfVel , 10 + lengthOfVel/3);
 		glPopMatrix();
 	}
-	
-	ofPoint vel = this->pr->getVelocityForTime(timeCounter);
-	ofPoint pt = this->pr->getPointForTime(timeCounter);
-	float height = (float)ofGetHeight();
-	float heightPct = ((height-pt.y) / height);
-	targetFrequency = 1000.0f * heightPct;
-	cout << (int)targetFrequency << endl; 
-	static float fx = 0;
-	static float fy = 0; 
-	fx += ( vel.x - fx ) / 50.0; 
-	fy += ( vel.y - fy ) / 50.0; 
-	ofLine( 100, 100, 100+fx*10, 100+fy*10 ); 
-	ofRect( 100, 200, targetFrequency/10, 10 ); 
-	ofRect( 100, 300, volume*100, 10 ); 
 }
 
 
