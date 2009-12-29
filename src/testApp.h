@@ -62,6 +62,10 @@ class testApp : public ofSimpleApp{
 		int spawnFocusPoint; 
 	
 		bool useEnvelope; 
+	
+		ofImage beatImgs[6];
+		ofImage shapeFlatImage, shapeSinusImg, shapeTriangleImg, shapeRectangleImg;
+		ofImage envelopeImg; 
 };
 
 #endif

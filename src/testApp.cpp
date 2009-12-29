@@ -41,6 +41,19 @@ void testApp::setup(){
 	lineToDelete = -1; 
 	beatMod = 32; 
 	useEnvelope = false; 
+	
+	// load images...
+	beatImgs[0].loadImage( "beat_0.png" );
+	beatImgs[1].loadImage( "beat_1.png" );
+	beatImgs[2].loadImage( "beat_2.png" );
+	beatImgs[3].loadImage( "beat_3.png" );
+	beatImgs[4].loadImage( "beat_4.png" );
+	beatImgs[5].loadImage( "beat_5.png" );
+	shapeFlatImage.loadImage( "shape_flat.png" );
+	shapeSinusImg.loadImage( "shape_sinus.png" );
+	shapeTriangleImg.loadImage( "shape_triangle.png" );
+	shapeRectangleImg.loadImage( "shape_rectangle.png" );
+	envelopeImg.loadImage( "envelope.png" ); 
 } 
 
 //--------------------------------------------------------------
@@ -108,18 +121,28 @@ void testApp::draw(){
 	
 	ofSetRectMode(OF_RECTMODE_CORNER);	
 	ofSetColor( 255, 255, 255 );
-	ofFill(); 
-	
+	ofNoFill(); 
+	ofSetLineWidth( 1 );
+
 	for( int i = 0; i < 6; i++ ){
-		if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) || (16<<i) == beatMod ){
-			ofSetColor( 50+205*triggerAlpha[i], 0, 0 ); 
+		
+		ofDisableSmoothing();
+		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) || (16<<i) == beatMod || (beatMod == 0 && i == 0 ) ){
+			int r = 50+50*triggerAlpha[i];
+			ofSetColor( r, r, r ); 
+			ofFill(); 
+			ofRect( 10, 10+i*30, 18, 18 ); 
+			ofNoFill(); 
 		}
-		else{
-			ofSetColor( 50*triggerAlpha[i], 50*triggerAlpha[i], 50*triggerAlpha[i] ); 
-		}
-		ofRect( 5+i*30, 5, 20, 20 ); 
-		ofSetColor( 150, 150, 150 ); 
-		ofDrawBitmapString( ofToString( i, 0 ), 11+i*30, 19 );
+		
+		ofSetColor( 0xFFFFFF ); 
+		ofEnableAlphaBlending();
+		beatImgs[i].draw( 10, 10+i*30 );
+		ofDisableAlphaBlending();
+		
+		int r = 100+100*triggerAlpha[i];
+		ofSetColor( r, r, r ); 
+		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
 	}
 	
 	for( int i = 0; i < 100; i++ ){
@@ -271,10 +294,10 @@ void testApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
 	// no mouse-thingie whatsover when hovering over the controls
-	if( mouseX <= 150 && mouseY <= 30 ){
+	if( mouseX <= 30 && mouseY <= 200 ){
 		
 		for( int i = 0; i < 6; i++ ){
-			if( this->inRect( mouseX*1.0, mouseY*1.0, 5+i*30.0, 5.0, 20.0, 20.0 ) ){
+			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 10+i*30.0, 20.0, 20.0 ) ){
 				if( i == 0 ){
 					beatMod = 0; 
 				}
@@ -284,8 +307,6 @@ void testApp::mousePressed(int x, int y, int button){
 				return; 
 			}
 		}
-		
-		
 		
 		return; 
 	}

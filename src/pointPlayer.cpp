@@ -141,7 +141,7 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 	
 	float envelopeScale = 1; 
 
-	if( useEnvelope ){
+	/*if( useEnvelope ){
 		float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0;
 		// buffer size is 256 (0.005sec), seems viable to calculate envelopescale only once! 
 		if( actualTime < attackTime ){
@@ -153,10 +153,23 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		else{
 			envelopeScale = 1; 
 		}
-	}
+	}*/
 	
 	
 	for (int i = 0; i < bufferSize; i++){
+		if( useEnvelope ){
+			float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0 + i/44100.0;
+			// buffer size is 256 (0.005sec), seems viable to calculate envelopescale only once! 
+			if( actualTime < attackTime ){
+				envelopeScale = fmin( 1, 1 - ( attackTime - actualTime ) / attackTime ); 
+			}
+			else if( actualTime > releaseTime ){
+				envelopeScale = fmax( 0, 1 - ( actualTime - releaseTime) / ( this->pr->getDuration() - releaseTime ) );
+			}
+			else{
+				envelopeScale = 1; 
+			}
+		}
 		// we run at 44100 samples/second. 
 		// so one iteration equals 1/44100 seconds. 
 		phase += phaseAdder;
