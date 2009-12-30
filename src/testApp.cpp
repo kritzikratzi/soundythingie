@@ -104,7 +104,7 @@ void testApp::update(){
 	
 	// trigger-fade-effect for the beat-mod selectors (no one understands what i mean, right?) 
 	for( int i = 1; i < 6; i++ ){
-		triggerAlpha[i] -= triggerAlpha[i]/30.; 
+		triggerAlpha[i] -= triggerAlpha[i]/(10+i*2.0); 
 		
 		if( ofGetFrameNum() % (16<<i) == 0 ){
 			triggerAlpha[i] = 1; 
@@ -127,25 +127,36 @@ void testApp::draw(){
 
 	for( int i = 0; i < 6; i++ ){
 		
-		ofDisableSmoothing();
-		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) || (16<<i) == beatMod || (beatMod == 0 && i == 0 ) ){
-			int r = 70+150*triggerAlpha[i];
-			ofSetColor( r, r, r ); 
-			ofFill(); 
-			//ofRect( 10, 10+i*30, 18, 18 ); 
-			ofSetColor( 0x555555 ); 
-			ofRect( 18, 18+i*30, 10, 10 ); 
-			ofNoFill(); 
-		}
-		
 		ofSetColor( 0xFFFFFF ); 
 		ofEnableAlphaBlending();
 		beatImgs[i].draw( 10, 10+i*30 );
+		
+		int r = 120*triggerAlpha[i];
+		ofFill(); 
+		ofSetColor( 255, 255, 255, r ); 
+		//ofCircle( 15.5, 15.5+i*30, 3 ); 
+		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
+
+		ofNoFill(); 
+		ofSetColor( 120, 120, 120 ); 
+		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
+
+		
+		if( i != 0 ){
+			ofSetColor( 150, 150, 150 ); 
+			int beat = 16<<i;
+			float t = (ofGetFrameNum()%beat)/(float) beat; 
+			ofRect( 10.5 + t*18, 11.5 + i*30, 1, 0 ); 
+		}
+		
+		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) || (16<<i) == beatMod || (beatMod == 0 && i == 0 ) ){
+			ofSetColor( 255, 255, 255, 150 ); 
+			ofRect( 10.5, 10.5+i*30, 18, 18 ); 
+		}
+		
+		
 		ofDisableAlphaBlending();
 		
-		int r = 120+100*triggerAlpha[i];
-		ofSetColor( r, r, r ); 
-		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
 	}
 	
 	for( int i = 0; i < 100; i++ ){
