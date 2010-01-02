@@ -13,6 +13,7 @@ int pointPlayer::idCount = 0;
 
 
 pointPlayer::pointPlayer(){
+	pr = NULL; 
 	id = idCount; 
 	idCount++; 
 	
@@ -30,9 +31,10 @@ void pointPlayer::setup( pointRecorder * pr ){
 	timeOfLastFrame		= ofGetElapsedTimef(); 
 	
 	// calculate attack and release time (50ms)
-	float attackLen = fmin( 50, this->pr->getDuration()/10 ); // max 50s or 10% attack time! 
-	attackTime = 0.05; 
-	releaseTime = this->pr->getDuration() - 0.05; 
+	attackTime = fmin( 0.1, this->pr->getDuration()/10 ); // max 0.1s or 10% attack time! 
+	releaseTime = this->pr->getDuration() - attackTime; 
+	doCrazyMath( true ); 
+	envelopeScale = 0; 
 }
 
 
@@ -45,12 +47,13 @@ void pointPlayer::update(){
 	samplesSinceUpdate = 0; 
 	
 	//cout << this->pr->bAmRecording << "--" << this->pr->pts.size() << "--" << timeCounter << "--" << this->pr->getDuration() << endl; 
-	if (this->pr->bAmRecording == false && this->pr->pts.size() > 1){
+	if ( this->pr != NULL && this->pr->bAmRecording == false && this->pr->pts.size() > 1){
 		if( timeCounter >= this->pr->getDuration() ){
 			// kill myself? 
 			if( this->pr->beatMod == 0 && this->pr->startTime != 0 ){
 				// reboot, beatless shit! 
 				timeCounter = 0; 
+				doCrazyMath( true ); 
 				// get updated volume! 
 				this->volume = this->pr->volume; 
 			}
@@ -60,18 +63,7 @@ void pointPlayer::update(){
 			}
 		}
 		else{
-			ofPoint vel = this->pr->getVelocityForTime(timeCounter);
-			ofPoint pt = this->pr->getPointForTime(timeCounter);
-			
-			float lengthOfVel = sqrt(vel.x * vel.x + vel.y * vel.y);
-			if (lengthOfVel > 40) lengthOfVel = 40;
-			amplitude = 0.94f * amplitude + 0.06f *( powf((lengthOfVel / 40.0f),2.0) * 0.5f);
-			int width = ofGetWidth();
-			pan = 0.95f * pan + 0.05f * ((float)pt.x / (float)width);
-			float height = (float)ofGetHeight();
-			float heightPct = ((height-pt.y) / height);
-			targetFrequency = 1000.0f * heightPct;
-			phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
+			doCrazyMath( false ); 
 		}
 	}
 	else{
@@ -111,58 +103,102 @@ void pointPlayer::draw(){
 
 
 void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, bool useEnvelope ){
+	// note: buffer size is 256 (0.005sec)
 	if( suicide ) return; 
 	
-	float leftScale = 1 - pan;
-	float rightScale = pan;
+	float leftScale, rightScale; 
 	
 	
 	// sin (n) seems to have trouble when n is very large, so we
 	// keep phase in the range of 0-TWO_PI like this:
-	while (phase > TWO_PI){
+	/*while (phase > TWO_PI){
 		phase -= TWO_PI;
-	}
-	
-	phaseAdder = 0.95f * phaseAdder + 0.05f * phaseAdderTarget;
-	
-	float envelopeScale = 1; 
-
-	/*if( useEnvelope ){
-		float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0;
-		// buffer size is 256 (0.005sec), seems viable to calculate envelopescale only once! 
-		if( actualTime < attackTime ){
-			envelopeScale = fmin( 1, 1 - ( attackTime - actualTime ) / attackTime ); 
-		}
-		else if( actualTime > releaseTime ){
-			envelopeScale = fmax( 0, 1 - ( actualTime - releaseTime) / ( this->pr->getDuration() - releaseTime ) );
-		}
-		else{
-			envelopeScale = 1; 
-		}
 	}*/
 	
+	float envelopeScaleTarget = 1; 
+	//amplitude = 0.1; 
 	
+	//pan = 0.95f * pan + 0.05f * panTarget;
+	int cycle = 0; 
 	for (int i = 0; i < bufferSize; i++){
+		     if( fabs( pan-panTarget) < 0.0001 ) ; //nothing happens! 
+		else if( pan < panTarget ) pan += 0.0001; 
+		else if( pan > panTarget ) pan -= 0.0001; 
+		
+		/*     if( fabs( phaseAdder - phaseAdderTarget ) < 0.00001 ) ; 
+		else if( phaseAdder < phaseAdderTarget ) phaseAdder += 0.00001; 
+		else if( phaseAdder > phaseAdderTarget ) phaseAdder -= 0.00001; */
+		phaseAdder = phaseAdderTarget*0.001f + phaseAdder*0.999f; 
+		
+		leftScale = 1-pan; 
+		rightScale = pan; 
+		
+		//phaseAdder = 0.99f * phaseAdder + 0.01f * phaseAdderTarget;
 		if( useEnvelope ){
 			float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0 + i/44100.0;
-			// buffer size is 256 (0.005sec), seems viable to calculate envelopescale only once! 
+			
 			if( actualTime < attackTime ){
-				envelopeScale = fmin( 1, 1 - ( attackTime - actualTime ) / attackTime ); 
+				cycle = 1; 
+				envelopeScaleTarget = fmin( 1, 1 - ( attackTime - actualTime ) / attackTime ); 
 			}
 			else if( actualTime > releaseTime ){
-				envelopeScale = fmax( 0, 1 - ( actualTime - releaseTime) / ( this->pr->getDuration() - releaseTime ) );
+				cycle = 2; 
+				envelopeScaleTarget = fmax( 0, 1 - ( actualTime - releaseTime) / ( this->pr->getDuration() - releaseTime ) );
 			}
 			else{
-				envelopeScale = 1; 
+				envelopeScaleTarget = 1; 
 			}
 		}
-		// we run at 44100 samples/second. 
-		// so one iteration equals 1/44100 seconds. 
+		
 		phase += phaseAdder;
+		phase = fmod( phase, TWO_PI ); 
+
+		/*if( fabs( amplitude - amplitudeTarget ) < 0.00001 ) ; //nothing happens! 
+		else if( amplitude < amplitudeTarget ) amplitude += 0.00001; 
+		else if( amplitude > amplitudeTarget ) amplitude -= 0.00001; */
+		amplitude = amplitudeTarget*0.001f + amplitude*0.999f; 
+		
+		if( fabs( envelopeScale - envelopeScaleTarget) < 0.001 ) ; //nothing happens! 
+		else if( envelopeScale < envelopeScaleTarget ) envelopeScale += 0.001; 
+		else if( envelopeScale > envelopeScaleTarget ) envelopeScale -= 0.001; 
+		
+		
 		float sample = sin(phase);
-		output[i*nChannels    ] += sample * amplitude * (volume*10) * leftScale * envelopeScale;
-		output[i*nChannels + 1] += sample * amplitude * (volume*10) * volume * rightScale * envelopeScale;
+		output[i*nChannels    ] += sample * amplitude * (volume*10) * leftScale  * envelopeScale;
+		output[i*nChannels + 1] += sample * amplitude * (volume*10) * rightScale * envelopeScale;
 	}
 	
+	
+	//cout << env << "," << (cycle==0?"F":cycle==1?"A":"R") << endl; 
+	
 	this->samplesSinceUpdate ++; 
+}
+
+/**
+ * Recalculate some target-values, 
+ * use the apply parameter to instantly 
+ * set the values to their corresponding target values. 
+ */
+void pointPlayer::doCrazyMath( bool apply ){
+	ofPoint vel = this->pr->getVelocityForTime(timeCounter);
+	ofPoint pt = this->pr->getPointForTime(timeCounter);
+	currentVelocity = vel; 
+	currentPoint = pt; 
+	
+	
+	float lengthOfVel = sqrt(vel.x * vel.x + vel.y * vel.y);
+	if (lengthOfVel > 40) lengthOfVel = 40;
+	//amplitude = 0.94f * amplitude + 0.06f *( powf((lengthOfVel / 40.0f),2.0) * 0.5f);
+	amplitudeTarget = powf((lengthOfVel / 40.0f),2.0) * 0.5f; 
+	panTarget = fmin( 1, fmax( 0, pt.x/(float)ofGetWidth() ) ); 
+	float height = (float)ofGetHeight();
+	float heightPct = ((height-pt.y) / height);
+	targetFrequency = 1000.0f * heightPct;
+	phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
+
+	
+	if( apply ){
+		phaseAdder = phaseAdderTarget; 
+		pan = panTarget; 
+	}
 }

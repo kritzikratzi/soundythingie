@@ -12,6 +12,7 @@ class pointPlayer{
 		void draw(); 
 		void update(); 
 		void audioRequested(float * output, int bufferSize, int nChannels, bool useEnvelope); 	
+		void doCrazyMath( bool apply ); 
 	
 		int triggerRate; 
 		pointRecorder * pr; 
@@ -25,13 +26,19 @@ class pointPlayer{
 		float	timeOfLastFrame;
 		float 	volume;
 		float	amplitude; 
+		float	amplitudeTarget; 
 		float 	pan;
+		float 	panTarget;
 		float 	sampleRate;
 		float	diffTime; 
-	
+		float   envelopeScale;
+		
 		bool	suicide; 
 		static int idCount; 
 		int id; 
+	
+		ofPoint currentPoint;
+		ofPoint currentVelocity; 
 	
 		// we use an "attack-hold-release" envelope. 
 		// for t=0...attackTime: attack

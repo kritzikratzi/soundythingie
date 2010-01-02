@@ -15,7 +15,7 @@ void testApp::setup(){
 	
 	ofBackground( 30,30,30 );
 	bFullscreen	= false;
-
+	useEnvelope = true; 
 	
 	timeCounter			= 0;
 	timeOfLastFrame		= ofGetElapsedTimef();
@@ -35,13 +35,14 @@ void testApp::setup(){
 	pan					= 0.5f;
 	bNoise 				= false;
 	
+	showAudio = false; 
+	
 	spawnFocusPoint = -1; 
 	spawnFocusRecorder = -1; 
 
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	lineToDelete = -1; 
 	beatMod = 32; 
-	useEnvelope = false; 
 	
 	// load images...
 	beatImgs[0].loadImage( "beat_0.png" );
@@ -69,7 +70,7 @@ void testApp::update(){
 	
 	// trigger players! 
 	for( int i = 0; i < 100; i++ ){
-		if( recorders[i].beatMod > 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
+		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
 			pairUpWithAnyPlayer( &recorders[i] ); 
 		}
 	}
@@ -127,7 +128,7 @@ void testApp::draw(){
 
 	for( int i = 0; i < 6; i++ ){
 		
-		ofSetColor( 0xFFFFFF ); 
+		ofSetColor( 0x999999 ); 
 		ofEnableAlphaBlending();
 		beatImgs[i].draw( 10, 10+i*30 );
 		
@@ -182,6 +183,25 @@ void testApp::draw(){
 		ofPoint *p = &recorders[spawnFocusRecorder].pts[spawnFocusPoint].pos; 
 		ofCircle( p->x, p->y, 5 ); 
 	}
+	
+	if( showAudio ){
+		int graphW = 107; 
+		int graphH = 107; 
+		ofSetLineWidth( 1 ); 
+		ofTranslate( 50, 10 );
+		ofScale( graphW/256.0f, graphH/200.0f ); 
+		ofSetRectMode( OF_RECTMODE_CORNER ); 
+		ofSetColor( 0x333333 );
+		ofNoFill(); 
+		ofRect(   0, 0, 256, 200 );
+		ofRect( 300, 0, 256, 200 );
+		ofSetColor( 0xFFFFFF );
+		for( int i = 0; i < 256; i++ ){
+			ofLine(   0 + i, 100,   0 + i ,100 + lAudio[i] * 100.0f );
+			ofLine( 300 + i, 100, 300 + i ,100 + rAudio[i] * 100.0f );
+		}
+	}
+	
 }
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
@@ -241,6 +261,11 @@ void testApp::keyPressed  (int key){
 		useEnvelope = !useEnvelope; 
 		cout << "Envelope: " << useEnvelope << endl; 
 	}
+	
+	if( key == 's' ){
+		showAudio = !showAudio; 
+	}
+	
 }
 
 //--------------------------------------------------------------
@@ -306,7 +331,6 @@ void testApp::mouseDragged(int x, int y, int button){
 void testApp::mousePressed(int x, int y, int button){
 	// no mouse-thingie whatsover when hovering over the controls
 	if( mouseX <= 30 && mouseY <= 200 ){
-		
 		for( int i = 0; i < 6; i++ ){
 			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 10+i*30.0, 20.0, 20.0 ) ){
 				if( i == 0 ){
@@ -325,6 +349,21 @@ void testApp::mousePressed(int x, int y, int button){
 	
 	if( lineToDelete >= 0 ){
 		recorders[lineToDelete].startTime = 0; 
+		
+		for( int i = 0; i < 100; i++ ){
+			if( i != lineToDelete ){
+				for( int j = 0; j < recorders[i].kids.size(); j++ ){
+					if( recorders[i].kids[j] == lineToDelete ){
+						recorders[i].kids.erase( recorders[i].kids.begin()+j );
+						j--; 
+					}
+				}
+			}
+			else{
+				deleteAllKids( &recorders[i]); 
+			}
+		}
+		
 		lineToDelete = -1; 
 		return; 
 	}
@@ -376,7 +415,7 @@ void testApp::mouseReleased(){
 
 //--------------------------------------------------------------
 void testApp::audioRequested(float * output, int bufferSize, int nChannels){	
-	
+
 	float leftScale = 1 - pan;
 	float rightScale = pan;
 	
@@ -402,9 +441,24 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 			players[i].audioRequested( output, bufferSize, nChannels, useEnvelope ); 
 		}
 	}
+	
+	for( int i = 0; i < 256; i++ ){
+		lAudio[i] = output[i*nChannels]; 
+		rAudio[i] = output[i*nChannels+1]; 
+	}
 }
 
-// ... 
+
+// ------------------------
+void testApp::deleteAllKids( pointRecorder * pr ){
+	for( int j = 0; j < pr->kids.size(); j++ ){
+		recorders[pr->kids[j]].startTime = 0;
+		deleteAllKids( &recorders[pr->kids[j]] ); 
+	}
+}
+
+
+// ------------------------
 bool testApp::inRect( float pX, float pY, float x, float y, float width, float height ){
 	return pX >= x && pX <= x + width && pY >= y && pY <= y + height; 
 }

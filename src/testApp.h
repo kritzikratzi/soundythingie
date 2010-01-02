@@ -23,6 +23,7 @@ class testApp : public ofSimpleApp{
 		void mousePressed(int x, int y, int button);
 		void mouseReleased();
 		void pairUpWithAnyPlayer( pointRecorder * pr ); 
+		void deleteAllKids( pointRecorder * pr ); 
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
 	
 		float triggerAlpha[6]; 
@@ -39,9 +40,10 @@ class testApp : public ofSimpleApp{
 		bool 	bNoise;
 		float 	volume;
 
-		float 	* lAudio;
-		float   * rAudio;
-
+		float 	lAudio[256];
+		float   rAudio[256];
+		bool	showAudio; 
+	
 		//------------------- for the simple sine wave synthesis
 		float 	targetFrequency;
 		float 	phase;
