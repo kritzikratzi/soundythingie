@@ -3,6 +3,7 @@
 
 #include "ofMain.h"
 //#include "ofAddons.h"
+#include <algorithm>
 
 #include "pointRecorder.h"
 #include "pointPlayer.h" 
@@ -11,7 +12,7 @@
 class testApp : public ofSimpleApp{
 
 	public:
-
+	
 		void setup();
 		void update();
 		void draw();
@@ -24,8 +25,11 @@ class testApp : public ofSimpleApp{
 		void mousePressed(int x, int y, int button);
 		void mouseReleased();
 		void pairUpWithAnyPlayer( pointRecorder * pr ); 
-		void deleteAllKids( pointRecorder * pr ); 
+		void deleteRecorder( int rec ); 
+		void deleteRecordersKids( int rec ); 
+	
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
+		bool inPoly( ofPoint *polygon, int N, ofPoint p ); 
 	
 		float triggerAlpha[6]; 
 	
@@ -56,26 +60,33 @@ class testApp : public ofSimpleApp{
 		
 		int whichRecorder; 
 		int beatMod; 
-	
-		int lineToDelete; 
-
-		bool  	bFullscreen;
-	
-	
+		
+		
+		
+		
 		// mouse focus? 
 		int spawnFocusRecorder; 
 		int spawnFocusPoint; 
 	
-		bool useEnvelope; 
 	
 		ofImage beatImgs[6];
 		ofImage shapeFlatImage, shapeSinusImg, shapeTriangleImg, shapeRectangleImg;
 		ofImage envelopeImg; 
-	
-		// shift pressed? 
-		bool shiftPressed; 
+		ofImage selectionImg; 
 	
 	
+		// some modes... 
+		bool  	bFullscreen;
+		bool useEnvelope; 
+		bool chromaticMode; 
+		bool selectionMode;	
+		int lineToDelete; 
+	
+	
+		// selection mode: 
+		ofPoint selection[1000]; 
+		int selectionLength;
+		vector <int> selectedRecorders; 
 };
 
 

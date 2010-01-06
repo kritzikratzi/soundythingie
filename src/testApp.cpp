@@ -44,7 +44,7 @@ void testApp::setup(){
 	lineToDelete = -1; 
 	beatMod = 32; 
 	
-	shiftPressed = false; 
+	chromaticMode = false; 
 	
 	// load images...
 	beatImgs[0].loadImage( "beat_0.png" );
@@ -58,6 +58,7 @@ void testApp::setup(){
 	shapeTriangleImg.loadImage( "shape_triangle.png" );
 	shapeRectangleImg.loadImage( "shape_rectangle.png" );
 	envelopeImg.loadImage( "envelope.png" ); 
+	selectionImg.loadImage( "selection.png" ); 
 } 
 
 //--------------------------------------------------------------
@@ -117,7 +118,6 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	
 	Tones::draw(); 
 	
 	for( int i = 0; i < 100; i++ ){
@@ -171,13 +171,42 @@ void testApp::draw(){
 		}
 	}
 	
+	if( selectionMode ){
+		ofSetRectMode(OF_RECTMODE_CORNER);	
+		ofEnableAlphaBlending();
+		ofSetColor( 0xFFFFFF ); 
+		selectionImg.draw( 10, 10+6*30 ); 
+		//selectionImg.draw( mouseX + 15, mouseY + 20 ); 
+		ofDisableAlphaBlending(); 
+		
+		
+		ofNoFill(); 
+		glEnable(GL_LINE_STIPPLE);
+		glLineStipple( 2, 0xF0F0 ); 
+		ofSetColor( 255, 255, 255 ); 
+		ofBeginShape(); 
+		
+		for( int i = 0; i < selectionLength; i++ ){
+			ofVertex( selection[i].x, selection[i].y ); 
+		}
+		
+		ofEndShape( false ); 
+		glDisable(GL_LINE_STIPPLE);
+	}
 	
 	//string report = "nPts = " + ofToString(nPts) + "\ntotal time = " + ofToString(totalDuration, 3);
 	//ofDrawBitmapString(report, 10, 10);
+	for( int i = 0; i < selectedRecorders.size(); i++ ){
+		pointRecorder * pr = &recorders[ selectedRecorders[i] ]; 
+		ofFill(); 
+		ofSetColor( 255, 0, 0 );
+		float radius = 2+2*pr->volume/0.1;
+		ofCircle( pr->pts[0].pos.x, pr->pts[0].pos.y, radius ); 
+	}
 	
 	if( lineToDelete >= 0 ){
 		ofFill(); 
-		ofSetColor( 255, 0, 0 ); 
+		ofSetColor( 255, 0, 0 );
 		float radius = 2+2*recorders[lineToDelete].volume/0.1;
 		ofCircle( recorders[lineToDelete].pts[0].pos.x, recorders[lineToDelete].pts[0].pos.y, radius ); 
 	}
@@ -223,7 +252,9 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
-
+	cout << key << endl; 
+	
+	
 	// set beat-mod using the keyboard
 	if( key >= '1' && key <= '5' ){
 		beatMod = 32<<(key-'1'); 
@@ -251,13 +282,23 @@ void testApp::keyPressed  (int key){
 		if( recorders[lineToDelete].volume > 1 ) recorders[lineToDelete].volume = 1; 
 	}
 	
-	if( key == 'd' && lineToDelete >= 0 ){
-		// delete! 
-		mousePressed(mouseX, mouseY, 1);
+	if( key == 'd' || key == 127 ){
+		// delete the one recorder being hovered, eventually... 
+		if( lineToDelete >= 0 ){
+			deleteRecorder( lineToDelete ); 
+		}
+		
+		// delete all recorders in the selection
+		for( int i = 0; i < selectedRecorders.size(); i++ ){
+			cout << "DELETE: " << selectedRecorders[i] << endl; 
+			deleteRecorder( selectedRecorders[i] );
+		}
+		
+		// empty selection! 
+		selectedRecorders.clear(); 
 	}
 	
-	if(key == 'f'){
-		
+	if( key == 'f' ){
 		bFullscreen = !bFullscreen;
 		ofSetFullscreen(bFullscreen);
 	}
@@ -268,21 +309,51 @@ void testApp::keyPressed  (int key){
 		cout << "Envelope: " << useEnvelope << endl; 
 	}
 	
-	if( key == 's' ){
+	if( key == 'a' ){
 		showAudio = !showAudio; 
 	}
 	
-	if( key == 't' ){
-		shiftPressed = true; 
+	if( key == 's' ){ // fresh selection
+		selectionMode = !selectionMode; 
+		selectionLength = 0; 
+		if( selectionMode ){
+			selectedRecorders.clear(); 
+		}
 	}
 	
+	if( key == 'S' ){ // add to selection
+		selectionMode = !selectionMode; 
+		selectionLength = 0; 
+	}
 	
+	if( key == 'i' ){ // invert selection
+		for( int i = 0; i<selectedRecorders.size(); i++ ) cout << selectedRecorders[i] << ", " ; 
+		cout << endl; 
+		
+		vector<int> temp; 
+		for( int i = 0; i < selectedRecorders.size(); i++ ) temp.push_back( selectedRecorders[i] ); 
+		sort( temp.begin(), temp.end() ); 
+		selectedRecorders.clear(); 
+		
+		for( int i = 0; i < 100; i++ ){
+			if( !binary_search( temp.begin(), temp.end(), i ) && recorders[i].startTime != 0 ){
+				selectedRecorders.push_back( i ); 
+			}
+		}
+		
+		for( int i = 0; i<selectedRecorders.size(); i++ ) cout << selectedRecorders[i] << ", " ; 
+		cout << endl; 
+	}
+	
+	if( key == 't' ){
+		chromaticMode = true; 
+	}
 }
 
 //--------------------------------------------------------------
 void testApp::keyReleased  (int key){
 	if( key == 't' ){
-		shiftPressed = false; 
+		chromaticMode = false; 
 	}
 }
 
@@ -337,8 +408,16 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-	if( shiftPressed ){
+	if( chromaticMode ){
 		y = Tones::snap( y ); 
+	}
+	
+	if( selectionMode ){
+		selection[selectionLength].x = x; 
+		selection[selectionLength].y = y; 
+		selectionLength++; 
+		
+		return; 
 	}
 	
 	if( whichRecorder >= 0 ){
@@ -348,9 +427,22 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-	if( shiftPressed ){
+	if( chromaticMode ){
 		y = Tones::snap( y ); 
 	}
+	
+	if( selectionMode ){
+		selectionLength = 0; 
+		selection[selectionLength].x = x; 
+		selection[selectionLength].y = y; 
+		selectionLength++; 
+		return; 
+	}
+	
+	if( !selectionMode && selectedRecorders.size() > 0 ){
+		selectedRecorders.clear(); 
+	}
+	
 	
 	// no mouse-thingie whatsover when hovering over the controls
 	if( mouseX <= 30 && mouseY <= 200 ){
@@ -371,23 +463,7 @@ void testApp::mousePressed(int x, int y, int button){
 	
 	
 	if( lineToDelete >= 0 ){
-		recorders[lineToDelete].startTime = 0; 
-		
-		for( int i = 0; i < 100; i++ ){
-			if( i != lineToDelete ){
-				for( int j = 0; j < recorders[i].kids.size(); j++ ){
-					if( recorders[i].kids[j] == lineToDelete ){
-						recorders[i].kids.erase( recorders[i].kids.begin()+j );
-						j--; 
-					}
-				}
-			}
-			else{
-				deleteAllKids( &recorders[i]); 
-			}
-		}
-		
-		lineToDelete = -1; 
+		deleteRecorder( lineToDelete ); 
 		return; 
 	}
 	
@@ -417,9 +493,30 @@ void testApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
-	if( shiftPressed ){
+	if( chromaticMode ){
 		mouseY = Tones::snap( mouseY ); 
 	}
+	
+	if( selectionMode ){
+		for( int i = 0; i < 100; i++ ){
+			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
+				if( inPoly( selection, selectionLength, recorders[i].pts[0].pos ) ){
+					// already selected? 
+					bool found = false; 
+					for( int j = 0; j < selectedRecorders.size(); j++ ){
+						if( selectedRecorders[j] == i ) found = true; 
+					}
+					
+					if( !found ) selectedRecorders.push_back( i ); 
+				}
+			}
+		}
+		
+		selectionMode = false; 
+		
+		return; 
+	}
+	
 	
 	if( whichRecorder >= 0 ){
 		if( recorders[whichRecorder].pts.size() >= 1 ){
@@ -477,15 +574,70 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 
 
 // ------------------------
-void testApp::deleteAllKids( pointRecorder * pr ){
-	for( int j = 0; j < pr->kids.size(); j++ ){
-		recorders[pr->kids[j]].startTime = 0;
-		deleteAllKids( &recorders[pr->kids[j]] ); 
+void testApp::deleteRecorder( int rec ){
+	recorders[rec].startTime = 0; 
+	
+	for( int i = 0; i < 100; i++ ){
+		if( i != rec ){
+			// remove the recorder from all the recorder it was triggered from 
+			// this doesn't have to be the case, it might be... 
+			for( int j = 0; j < recorders[i].kids.size(); j++ ){
+				if( recorders[i].kids[j] == rec ){
+					recorders[i].kids.erase( recorders[i].kids.begin()+j );
+					j--; 
+				}
+			}
+		}
+		else{
+			// delete all the recorders (if there are any) 
+			// that were triggered by this recorder
+			deleteRecordersKids( i ); 
+		}
 	}
+	
+	lineToDelete = -1; 
+	return; 
 }
 
+// ------------------------
+void testApp::deleteRecordersKids( int rec ){
+	for( int j = 0; j < recorders[rec].kids.size(); j++ ){
+		recorders[recorders[rec].kids[j]].startTime = 0;
+		deleteRecordersKids( recorders[rec].kids[j] ); 
+	}
+}
 
 // ------------------------
 bool testApp::inRect( float pX, float pY, float x, float y, float width, float height ){
 	return pX >= x && pX <= x + width && pY >= y && pY <= y + height; 
+}
+
+// ------------------------
+bool testApp::inPoly(ofPoint *polygon,int N, ofPoint p ){
+	int counter = 0;
+	int i;
+	double xinters;
+	ofPoint p1,p2;
+	
+	p1 = polygon[0];
+	for (i=1;i<=N;i++) {
+		p2 = polygon[i % N];
+		if (p.y > MIN(p1.y,p2.y)) {
+			if (p.y <= MAX(p1.y,p2.y)) {
+				if (p.x <= MAX(p1.x,p2.x)) {
+					if (p1.y != p2.y) {
+						xinters = (p.y-p1.y)*(p2.x-p1.x)/(p2.y-p1.y)+p1.x;
+						if (p1.x == p2.x || p.x <= xinters)
+							counter++;
+					}
+				}
+			}
+		}
+		p1 = p2;
+	}
+	
+	if (counter % 2 == 0)
+		return false;
+	else
+		return true;
 }

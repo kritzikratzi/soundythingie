@@ -195,7 +195,6 @@ void pointPlayer::doCrazyMath( bool apply ){
 	float heightPct = ((height-pt.y) / height);
 	targetFrequency = 5000.0f * heightPct;
 	phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
-	cout << targetFrequency << endl; 
 
 	
 	if( apply ){

@@ -35,6 +35,6 @@ TODO:
   the second line copies the player from line (1) as soon as it reaches
   the intersection. 
 - saving and loading 
-- selecting multiple nodes, then being able to delete, change volume, moving around
+~ selecting multiple nodes, then being able to delete, change volume, moving around
 - different wave forms (flat, rectangle, triangle, sinus)
 - make bars bigger/smaller according to volume
