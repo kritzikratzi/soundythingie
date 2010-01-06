@@ -193,8 +193,9 @@ void pointPlayer::doCrazyMath( bool apply ){
 	panTarget = fmin( 1, fmax( 0, pt.x/(float)ofGetWidth() ) ); 
 	float height = (float)ofGetHeight();
 	float heightPct = ((height-pt.y) / height);
-	targetFrequency = 1000.0f * heightPct;
+	targetFrequency = 5000.0f * heightPct;
 	phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
+	cout << targetFrequency << endl; 
 
 	
 	if( apply ){

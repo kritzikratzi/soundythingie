@@ -12,7 +12,7 @@ void pointRecorder::draw() {
 	
 	//---------------------------
 	// (a) create a small report 
-	ofSetColor(100,100,100);
+	ofSetColor(200,200,200);
 	// get the number of points and the time of the last point:
 	int nPts = pts.size();
 	float totalDuration = getDuration();

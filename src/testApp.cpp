@@ -13,7 +13,7 @@ void testApp::setup(){
 	
 	// set background: 
 	
-	ofBackground( 30,30,30 );
+	ofBackground( 0,0,0 );
 	bFullscreen	= false;
 	useEnvelope = true; 
 	
@@ -43,6 +43,8 @@ void testApp::setup(){
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	lineToDelete = -1; 
 	beatMod = 32; 
+	
+	shiftPressed = false; 
 	
 	// load images...
 	beatImgs[0].loadImage( "beat_0.png" );
@@ -115,6 +117,9 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	
+	Tones::draw(); 
+	
 	for( int i = 0; i < 100; i++ ){
 		if( recorders[i].startTime != 0 ){
 			recorders[i].draw(); 
@@ -218,6 +223,7 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
+
 	// set beat-mod using the keyboard
 	if( key >= '1' && key <= '5' ){
 		beatMod = 32<<(key-'1'); 
@@ -266,10 +272,18 @@ void testApp::keyPressed  (int key){
 		showAudio = !showAudio; 
 	}
 	
+	if( key == 't' ){
+		shiftPressed = true; 
+	}
+	
+	
 }
 
 //--------------------------------------------------------------
 void testApp::keyReleased  (int key){
+	if( key == 't' ){
+		shiftPressed = false; 
+	}
 }
 
 //--------------------------------------------------------------
@@ -302,6 +316,7 @@ void testApp::mouseMoved(int x, int y ){
 		float distance = 100;
 		float dx, dy; 
 		
+		
 		for( int i = 0; i < 100; i++ ){
 			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
 				for( int j = 0; j < recorders[i].pts.size(); j++ ){
@@ -322,6 +337,10 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
+	if( shiftPressed ){
+		y = Tones::snap( y ); 
+	}
+	
 	if( whichRecorder >= 0 ){
 		recorders[whichRecorder].addPoint( ofPoint(x,y,0) );
 	}
@@ -329,6 +348,10 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+	if( shiftPressed ){
+		y = Tones::snap( y ); 
+	}
+	
 	// no mouse-thingie whatsover when hovering over the controls
 	if( mouseX <= 30 && mouseY <= 200 ){
 		for( int i = 0; i < 6; i++ ){
@@ -394,6 +417,10 @@ void testApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
+	if( shiftPressed ){
+		mouseY = Tones::snap( mouseY ); 
+	}
+	
 	if( whichRecorder >= 0 ){
 		if( recorders[whichRecorder].pts.size() >= 1 ){
 			recorders[whichRecorder].addPoint( ofPoint(mouseX, mouseY,0) );

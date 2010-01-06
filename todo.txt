@@ -1,6 +1,7 @@
 TODO: 
 
 
+- fix bug where kids are spawned at the wrong time
 + make lines deletable
 + allow changing volume (use +/- keys)
 - change volume with scroll-wheel
@@ -16,7 +17,7 @@ TODO:
   space bar
 - ability to save/load
 + ability to clear out everything
-- show proper octaves and notes (c d e f g... ) super-light as an orientation. 
++ show proper octaves and notes (c d e f g... ) super-light as an orientation. 
 - build method into it so people can easily export audio/video? 
   nah... just use snapz! 
 - make the space-bar the "live" key, where the mouse-velocity is played. 
@@ -33,3 +34,7 @@ TODO:
   
   the second line copies the player from line (1) as soon as it reaches
   the intersection. 
+- saving and loading 
+- selecting multiple nodes, then being able to delete, change volume, moving around
+- different wave forms (flat, rectangle, triangle, sinus)
+- make bars bigger/smaller according to volume

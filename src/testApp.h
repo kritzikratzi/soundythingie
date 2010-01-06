@@ -6,6 +6,7 @@
 
 #include "pointRecorder.h"
 #include "pointPlayer.h" 
+#include "Tones.h"
 
 class testApp : public ofSimpleApp{
 
@@ -70,7 +71,13 @@ class testApp : public ofSimpleApp{
 		ofImage beatImgs[6];
 		ofImage shapeFlatImage, shapeSinusImg, shapeTriangleImg, shapeRectangleImg;
 		ofImage envelopeImg; 
+	
+		// shift pressed? 
+		bool shiftPressed; 
+	
+	
 };
+
 
 #endif
 
