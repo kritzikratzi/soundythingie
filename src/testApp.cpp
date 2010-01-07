@@ -118,7 +118,10 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	Tones::draw(); 
+	Tones::checkInit(); 
+	if( chromaticMode ){
+		Tones::draw(); 
+	}
 	
 	for( int i = 0; i < RECORDERS; i++ ){
 		if( recorders[i].startTime != 0 ){
