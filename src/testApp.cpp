@@ -63,7 +63,7 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].update(); 
 		}
@@ -72,7 +72,7 @@ void testApp::update(){
 	
 	
 	// trigger players! 
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < RECORDERS; i++ ){
 		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
 			pairUpWithAnyPlayer( &recorders[i] ); 
 		}
@@ -80,7 +80,7 @@ void testApp::update(){
 	
 	// trigger kids!
 	//cout << "---------------" << endl; 
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < RECORDERS; i++ ){
 		if( recorders[i].kids.size() > 0 ){
 			
 			pointRecorder * rec = &recorders[i]; 
@@ -90,14 +90,14 @@ void testApp::update(){
 				double x1, x2; 
 				
 				// is there a player that JUST played this? 
-				for( int k = 0; k < 100; k++ ){
+				for( int k = 0; k < PLAYERS; k++ ){
 					x2 = players[k].timeCounter; 
 					x1 = x2 - (double)players[k].diffTime; 
 					
 					if( players[k].suicide == false && players[k].pr == rec && x1 <= when && when < x2 ){
 						// cout << "play line nr " << rec->kids[j] << ", kid of line nr. " << i << "; j=" << j << ", k= " << k << endl; 
 						pairUpWithAnyPlayer( &(recorders[rec->kids[j]]) ); 
-						k = 100; // "break" on the k-level
+						k = PLAYERS; // "break" on the k-level
 					}
 				}
 			}
@@ -120,7 +120,7 @@ void testApp::update(){
 void testApp::draw(){
 	Tones::draw(); 
 	
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < RECORDERS; i++ ){
 		if( recorders[i].startTime != 0 ){
 			recorders[i].draw(); 
 		}
@@ -165,7 +165,7 @@ void testApp::draw(){
 		
 	}
 	
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].draw(); 
 		}
@@ -239,7 +239,7 @@ void testApp::draw(){
 }
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < PLAYERS; i++ ){
 		if( players[i].suicide ){
 			players[i].setup( pr ); 
 			return; 
@@ -252,7 +252,6 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
-	cout << key << endl; 
 	
 	
 	// set beat-mod using the keyboard
@@ -264,7 +263,7 @@ void testApp::keyPressed  (int key){
 	}
 	
 	if( key == 'c' ){
-		for( int i = 0; i < 100; i++ ){
+		for( int i = 0; i < RECORDERS; i++ ){
 			//recorders[i].clear(); 
 			recorders[i].startTime = 0; 
 			//players[i].suicide = true; 
@@ -304,7 +303,6 @@ void testApp::keyPressed  (int key){
 		
 		// delete all recorders in the selection
 		for( int i = 0; i < selectedRecorders.size(); i++ ){
-			cout << "DELETE: " << selectedRecorders[i] << endl; 
 			deleteRecorder( selectedRecorders[i] );
 		}
 		
@@ -341,22 +339,16 @@ void testApp::keyPressed  (int key){
 	}
 	
 	if( key == 'i' ){ // invert selection
-		for( int i = 0; i<selectedRecorders.size(); i++ ) cout << selectedRecorders[i] << ", " ; 
-		cout << endl; 
-		
 		vector<int> temp; 
 		for( int i = 0; i < selectedRecorders.size(); i++ ) temp.push_back( selectedRecorders[i] ); 
 		sort( temp.begin(), temp.end() ); 
 		selectedRecorders.clear(); 
 		
-		for( int i = 0; i < 100; i++ ){
+		for( int i = 0; i < RECORDERS; i++ ){
 			if( !binary_search( temp.begin(), temp.end(), i ) && recorders[i].startTime != 0 ){
 				selectedRecorders.push_back( i ); 
 			}
 		}
-		
-		for( int i = 0; i<selectedRecorders.size(); i++ ) cout << selectedRecorders[i] << ", " ; 
-		cout << endl; 
 	}
 	
 	if( key == 't' ){
@@ -375,11 +367,10 @@ void testApp::keyReleased  (int key){
 void testApp::mouseMoved(int x, int y ){
 	lineToDelete = -1; 
 	
-	cout << y << ": " << Tones::fValue( y ) << endl; 
 	// are we really really close to a line? 
 	if( whichRecorder == -1 ){
 		float dx, dy; 
-		for( int i = 0; i < 100; i++ ){
+		for( int i = 0; i < RECORDERS; i++ ){
 			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
 				// are we really close to the first point? 
 				float dx = mouseX - recorders[i].pts[0].pos.x; 
@@ -402,7 +393,7 @@ void testApp::mouseMoved(int x, int y ){
 		float dx, dy; 
 		
 		
-		for( int i = 0; i < 100; i++ ){
+		for( int i = 0; i < RECORDERS; i++ ){
 			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
 				for( int j = 0; j < recorders[i].pts.size(); j++ ){
 					// are we really close to the first point? 
@@ -481,7 +472,7 @@ void testApp::mousePressed(int x, int y, int button){
 		return; 
 	}
 	
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < RECORDERS; i++ ){
 		if( recorders[i].startTime == 0 ){
 			whichRecorder = i; 
 			recorders[whichRecorder].reset( this->beatMod ); 
@@ -512,7 +503,7 @@ void testApp::mouseReleased(){
 	}
 	
 	if( selectionMode ){
-		for( int i = 0; i < 100; i++ ){
+		for( int i = 0; i < RECORDERS; i++ ){
 			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
 				if( inPoly( selection, selectionLength, recorders[i].pts[0].pos ) ){
 					// already selected? 
@@ -574,7 +565,7 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 		output[i*nChannels + 1] = 0; 
 	}
 	
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].audioRequested( output, bufferSize, nChannels, useEnvelope ); 
 		}
@@ -591,7 +582,7 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 void testApp::deleteRecorder( int rec ){
 	recorders[rec].startTime = 0; 
 	
-	for( int i = 0; i < 100; i++ ){
+	for( int i = 0; i < RECORDERS; i++ ){
 		if( i != rec ){
 			// remove the recorder from all the recorder it was triggered from 
 			// this doesn't have to be the case, it might be... 

@@ -9,6 +9,8 @@
 #include "pointPlayer.h" 
 #include "Tones.h"
 
+#define RECORDERS 200
+#define PLAYERS 200
 class testApp : public ofSimpleApp{
 
 	public:
@@ -55,8 +57,8 @@ class testApp : public ofSimpleApp{
 		float 	phaseAdder;
 		float 	phaseAdderTarget;
 	
-		pointRecorder recorders[100];
-		pointPlayer players[100];
+		pointRecorder recorders[RECORDERS];
+		pointPlayer players[PLAYERS];
 		
 		int whichRecorder; 
 		int beatMod; 

@@ -3,7 +3,7 @@
 
 //------------------------------------------------------------------
 pointRecorder::pointRecorder(){
-	maxNumPts = 500;  // try 50, for example....
+	maxNumPts = 5000;  // try 50, for example....
 	startTime = 0;
 }
 

@@ -47,7 +47,6 @@ float Tones::snap( float y ){
 		if( y <= y1 && y >= y3 ){
 			return y2; 
 		}
-		
 	}
 }
 
@@ -57,6 +56,7 @@ float Tones::snap( float y ){
  * Output will be 4.13....10000
  */
 float Tones::fValue( float y ){
+	y = fmin( fmax( 0, y ), ofGetHeight() ); 
 	static float temp; 
 	temp = (ofGetHeight()-y)/ofGetHeight(); 
 	return -1884.84*logf( 1.005-temp ) + 13.5307; 
@@ -66,5 +66,6 @@ float Tones::fValue( float y ){
  * Inverse function of f 
  */
 float Tones::yValue( float f ){
+	f = fmin( fmax( 4.13, f ), 10000 ); 
 	return ofGetHeight()-ofGetHeight()* ( -expf( -0.00053055 * f ) * ( 1.0072 - 1.005*expf( 0.00053055 * f ) )); 
 }
