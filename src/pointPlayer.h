@@ -4,6 +4,7 @@
 
 #include "ofMain.h"
 #include "pointRecorder.h" 
+#include "Tones.h" 
 
 class pointPlayer{
 	public: 

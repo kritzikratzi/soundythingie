@@ -192,8 +192,9 @@ void pointPlayer::doCrazyMath( bool apply ){
 	amplitudeTarget = powf((lengthOfVel / 40.0f),2.0) * 0.5f; 
 	panTarget = fmin( 1, fmax( 0, pt.x/(float)ofGetWidth() ) ); 
 	float height = (float)ofGetHeight();
-	float heightPct = ((height-pt.y) / height);
-	targetFrequency = 5000.0f * heightPct;
+	//float heightPct = ((height-pt.y) / height);
+	//targetFrequency = 5000.0f * heightPct;
+	targetFrequency = Tones::fValue( pt.y ); 
 	phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
 
 	

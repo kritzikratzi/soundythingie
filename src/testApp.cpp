@@ -272,14 +272,28 @@ void testApp::keyPressed  (int key){
 	}
 	
 	
-	if( key == '-' && lineToDelete >= 0 ){
-		recorders[lineToDelete].volume -= 0.01; 
-		if( recorders[lineToDelete].volume < 0 ) recorders[lineToDelete].volume = 0; 
+	if( key == '-' ){
+		if( lineToDelete >= 0 ){
+			recorders[lineToDelete].volume -= 0.01; 
+			if( recorders[lineToDelete].volume < 0 ) recorders[lineToDelete].volume = 0; 
+		}
+		
+		for( int i = 0; i < selectedRecorders.size(); i++ ){
+			recorders[selectedRecorders[i]].volume -= 0.01; 
+			if( recorders[selectedRecorders[i]].volume < 0 ) recorders[selectedRecorders[i]].volume = 0; 
+		}		
 	}
 
-	if( key == '+' && lineToDelete >= 0 ){
-		recorders[lineToDelete].volume += 0.01; 
-		if( recorders[lineToDelete].volume > 1 ) recorders[lineToDelete].volume = 1; 
+	if( key == '+' ){
+		if( lineToDelete >= 0 ){
+			recorders[lineToDelete].volume += 0.01; 
+			if( recorders[lineToDelete].volume > 1 ) recorders[lineToDelete].volume = 1; 
+		}
+		
+		for( int i = 0; i < selectedRecorders.size(); i++ ){
+			recorders[selectedRecorders[i]].volume += 0.01; 
+			if( recorders[selectedRecorders[i]].volume > 1 ) recorders[selectedRecorders[i]].volume = 1; 
+		}
 	}
 	
 	if( key == 'd' || key == 127 ){
@@ -361,7 +375,7 @@ void testApp::keyReleased  (int key){
 void testApp::mouseMoved(int x, int y ){
 	lineToDelete = -1; 
 	
-	
+	cout << y << ": " << Tones::fValue( y ) << endl; 
 	// are we really really close to a line? 
 	if( whichRecorder == -1 ){
 		float dx, dy; 

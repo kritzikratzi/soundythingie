@@ -20,6 +20,8 @@ class Tones{
 	static void init(); 
 	static void draw(); 
 	static float snap( float y );
+	static float fValue( float y ); 
+	static float yValue( float f ); 
 };
 
 
