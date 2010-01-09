@@ -38,3 +38,9 @@ TODO:
 ~ selecting multiple nodes, then being able to delete, change volume, moving around
 - different wave forms (flat, rectangle, triangle, sinus)
 - make bars bigger/smaller according to volume
+- move instead of delete when touching on the circle
+- drag to any edge to delete
+- allow to change beat with 0...5 when selected/hovered
+- when curve is delete remove it along with the last runner
+- make runners friendlier? 
+- kids spawn off with the beat-subdivision that is selected (e.g. 0=1-> every single one, 2->every second one, etc.) 
