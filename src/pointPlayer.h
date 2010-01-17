@@ -9,7 +9,7 @@
 // shape functions
 float shapeFlat( float t ); 
 float shapeSinus( float t ); 
-float shapeTriangle( float t ); 
+float shapeSawtooth( float t ); 
 float shapeRectangle( float t ); 
 
 class pointPlayer{

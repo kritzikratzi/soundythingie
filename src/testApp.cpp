@@ -55,7 +55,7 @@ void testApp::setup(){
 	beatImgs[5].loadImage( "beat_5.png" );
 	shapeImgs[0].loadImage( "shape_flat.png" ); 
 	shapeImgs[1].loadImage( "shape_sinus.png" ); 
-	shapeImgs[2].loadImage( "shape_triangle.png" ); 
+	shapeImgs[2].loadImage( "shape_sawtooth.png" ); 
 	shapeImgs[3].loadImage( "shape_rectangle.png" ); 
 	envelopeImg.loadImage( "envelope.png" ); 
 	selectionImg.loadImage( "selection.png" ); 

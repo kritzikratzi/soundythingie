@@ -13,7 +13,7 @@
 #define PLAYERS 200
 #define SHAPE_FLAT 0
 #define SHAPE_SINUS 1
-#define SHAPE_TRIANGLE 2
+#define SHAPE_SAWTOOTH 2
 #define SHAPE_RECTANGLE 3
 
 class testApp : public ofSimpleApp{

@@ -123,7 +123,7 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 	float (*shapeFunc)(float);
 	if( pr->soundShape == 0 ) shapeFunc = &shapeFlat; 
 	if( pr->soundShape == 1 ) shapeFunc = &shapeSinus; 
-	if( pr->soundShape == 2 ) shapeFunc = &shapeTriangle;
+	if( pr->soundShape == 2 ) shapeFunc = &shapeSawtooth;
 	if( pr->soundShape == 3 ) shapeFunc = &shapeRectangle;
 	
 	//pan = 0.95f * pan + 0.05f * panTarget;
@@ -214,5 +214,5 @@ void pointPlayer::doCrazyMath( bool apply ){
 
 float shapeFlat( float t ){ return 0; }
 float shapeSinus( float t ){ return sin( t ); }
-float shapeTriangle( float t ){ return t < PI? (-1+2*t/PI) : (1-2*(t-PI)/PI); }
+float shapeSawtooth( float t ){ return 1-2*t/TWO_PI; }
 float shapeRectangle( float t ){ return t < PI? 1 : -1; }
