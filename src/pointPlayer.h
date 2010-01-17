@@ -6,6 +6,12 @@
 #include "pointRecorder.h" 
 #include "Tones.h" 
 
+// shape functions
+float shapeFlat( float t ); 
+float shapeSinus( float t ); 
+float shapeTriangle( float t ); 
+float shapeRectangle( float t ); 
+
 class pointPlayer{
 	public: 
 		pointPlayer(); 
@@ -14,6 +20,7 @@ class pointPlayer{
 		void update(); 
 		void audioRequested(float * output, int bufferSize, int nChannels, bool useEnvelope); 	
 		void doCrazyMath( bool apply ); 
+	
 	
 		int triggerRate; 
 		pointRecorder * pr; 

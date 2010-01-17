@@ -54,7 +54,8 @@ class pointRecorder {
 	
 		int offsetX; 
 		int offsetY; 
-		
+		int soundShape; 
+	
 };
 
 #endif // POINT_RECORDER_H

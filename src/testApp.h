@@ -11,6 +11,11 @@
 
 #define RECORDERS 200
 #define PLAYERS 200
+#define SHAPE_FLAT 0
+#define SHAPE_SINUS 1
+#define SHAPE_TRIANGLE 2
+#define SHAPE_RECTANGLE 3
+
 class testApp : public ofSimpleApp{
 
 	public:
@@ -30,6 +35,7 @@ class testApp : public ofSimpleApp{
 		void deleteRecorder( int rec ); 
 		void deleteRecordersKids( int rec ); 
 		void moveRecorder( int rec, int dx, int dy, bool moveKids ); 
+		void drawImage( ofImage * img, float x, float y, bool selected = false, float overlay = 0 );
 	
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
 		bool inPoly( ofPoint *polygon, int N, ofPoint p ); 
@@ -63,6 +69,7 @@ class testApp : public ofSimpleApp{
 		
 		int whichRecorder; 
 		int beatMod; 
+		int soundShape; 
 		
 		
 		// variables to get the mouse position from the previous frame... 
@@ -77,11 +84,10 @@ class testApp : public ofSimpleApp{
 	
 	
 		ofImage beatImgs[6];
-		ofImage shapeFlatImage, shapeSinusImg, shapeTriangleImg, shapeRectangleImg;
+		ofImage shapeImgs[4]; 
 		ofImage envelopeImg; 
 		ofImage selectionImg; 
-	
-	
+		
 		// some modes... 
 		bool  	bFullscreen;
 		bool useEnvelope; 

@@ -8,6 +8,7 @@
  */
 
 #include "pointPlayer.h"
+#include "ofMain.h"
 
 int pointPlayer::idCount = 0;
 
@@ -118,6 +119,13 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 	float envelopeScaleTarget = 1; 
 	//amplitude = 0.1; 
 	
+	
+	float (*shapeFunc)(float);
+	if( pr->soundShape == 0 ) shapeFunc = &shapeFlat; 
+	if( pr->soundShape == 1 ) shapeFunc = &shapeSinus; 
+	if( pr->soundShape == 2 ) shapeFunc = &shapeTriangle;
+	if( pr->soundShape == 3 ) shapeFunc = &shapeRectangle;
+	
 	//pan = 0.95f * pan + 0.05f * panTarget;
 	int cycle = 0; 
 	for (int i = 0; i < bufferSize; i++){
@@ -163,7 +171,7 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		else if( envelopeScale > envelopeScaleTarget ) envelopeScale -= 0.001; 
 		
 		
-		float sample = sin(phase);
+		float sample = shapeFunc(phase);
 		output[i*nChannels    ] += sample * amplitude * (volume*10) * leftScale  * envelopeScale;
 		output[i*nChannels + 1] += sample * amplitude * (volume*10) * rightScale * envelopeScale;
 	}
@@ -203,3 +211,8 @@ void pointPlayer::doCrazyMath( bool apply ){
 		pan = panTarget; 
 	}
 }
+
+float shapeFlat( float t ){ return 0; }
+float shapeSinus( float t ){ return sin( t ); }
+float shapeTriangle( float t ){ return t < PI? (-1+2*t/PI) : (1-2*(t-PI)/PI); }
+float shapeRectangle( float t ){ return t < PI? 1 : -1; }

@@ -16,7 +16,6 @@ void testApp::setup(){
 	ofBackground( 0,0,0 );
 	bFullscreen	= false;
 	useEnvelope = true; 
-	
 	timeCounter			= 0;
 	timeOfLastFrame		= ofGetElapsedTimef();
 	lastMousePressed = 0; 
@@ -43,6 +42,7 @@ void testApp::setup(){
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	lineHovered = -1; 
 	beatMod = 32; 
+	soundShape = 1; 
 	
 	chromaticMode = false; 
 	
@@ -53,10 +53,10 @@ void testApp::setup(){
 	beatImgs[3].loadImage( "beat_3.png" );
 	beatImgs[4].loadImage( "beat_4.png" );
 	beatImgs[5].loadImage( "beat_5.png" );
-	shapeFlatImage.loadImage( "shape_flat.png" );
-	shapeSinusImg.loadImage( "shape_sinus.png" );
-	shapeTriangleImg.loadImage( "shape_triangle.png" );
-	shapeRectangleImg.loadImage( "shape_rectangle.png" );
+	shapeImgs[0].loadImage( "shape_flat.png" ); 
+	shapeImgs[1].loadImage( "shape_sinus.png" ); 
+	shapeImgs[2].loadImage( "shape_triangle.png" ); 
+	shapeImgs[3].loadImage( "shape_rectangle.png" ); 
 	envelopeImg.loadImage( "envelope.png" ); 
 	selectionImg.loadImage( "selection.png" ); 
 } 
@@ -164,23 +164,17 @@ void testApp::draw(){
 	ofNoFill(); 
 	ofSetLineWidth( 1 );
 
+	// Draw beat-images
 	for( int i = 0; i < 6; i++ ){
-		
-		ofSetColor( 0x999999 ); 
-		ofEnableAlphaBlending();
-		beatImgs[i].draw( 10, 10+i*30 );
-		
-		int r = 120*triggerAlpha[i];
-		ofFill(); 
-		ofSetColor( 255, 255, 255, r ); 
-		//ofCircle( 15.5, 15.5+i*30, 3 ); 
-		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
+		// draw images... 
+		int alpha = 120*triggerAlpha[i];
+		bool selected = 
+			this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
+			(16<<i) == beatMod || (beatMod == 0 && i == 0 ); // selected
 
-		ofNoFill(); 
-		ofSetColor( 120, 120, 120 ); 
-		ofRect( 10.5, 10.5+i*30, 18, 18 ); 
-
+		drawImage( &beatImgs[i], 10, 10+i*30, selected, alpha ); 
 		
+		// a little guide to show "where" in the beat we are
 		if( i != 0 ){
 			ofSetColor( 150, 150, 150 ); 
 			int beat = 16<<i;
@@ -188,16 +182,16 @@ void testApp::draw(){
 			ofRect( 10.5 + t*18, 11.5 + i*30, 1, 0 ); 
 		}
 		
-		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) || (16<<i) == beatMod || (beatMod == 0 && i == 0 ) ){
-			ofSetColor( 255, 255, 255, 150 ); 
-			ofRect( 10.5, 10.5+i*30, 18, 18 ); 
-		}
-		
-		
-		ofDisableAlphaBlending();
-		
 	}
 	
+	// Draw images for wave forms... 
+	for( int i = 0; i < 4; i++ ){
+		bool selected = this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 220.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
+		soundShape == i; // selected
+		drawImage( &shapeImgs[i], 10, 220+i*30, selected ); 
+	}
+	
+	// Draw point players
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].draw(); 
@@ -518,21 +512,20 @@ void testApp::mousePressed(int x, int y, int button){
 	}
 	
 	
-	// no mouse-thingie whatsover when hovering over the controls
-	if( mouseX <= 30 && mouseY <= 200 ){
+	// handle the buttons... 
+	if( mouseX <= 30 ){
 		for( int i = 0; i < 6; i++ ){
 			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 10+i*30.0, 20.0, 20.0 ) ){
-				if( i == 0 ){
-					beatMod = 0; 
-				}
-				else{
-					beatMod = 16 << i; 
-				}
+				beatMod = i==0? 0 : (16<<i); 
+				return;
+			}
+		}
+		for( int i = 0; i < 4; i++ ){
+			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 220+i*30.0, 20.0, 20.0 ) ){
+				soundShape = i; 
 				return; 
 			}
 		}
-		
-		return; 
 	}
 	
 	
@@ -547,6 +540,7 @@ void testApp::mousePressed(int x, int y, int button){
 		if( recorders[i].startTime == 0 ){
 			whichRecorder = i; 
 			recorders[whichRecorder].reset( this->beatMod ); 
+			recorders[whichRecorder].soundShape = soundShape; 
 			
 			if( spawnFocusRecorder >= 0 ){
 				pointRecorder * rec = &recorders[spawnFocusRecorder]; 
@@ -592,7 +586,7 @@ void testApp::mouseReleased(){
 		return; 
 	}
 	
-	if( lineHovered >= 0 && ofGetElapsedTimef() - lastMousePressed < 0.1 ){
+	if( lineHovered >= 0 && ofGetElapsedTimef() - lastMousePressed < 0.20 ){
 		deleteRecorder( lineHovered ); 
 		lineHovered = -1; 
 	}
@@ -699,6 +693,29 @@ void testApp::moveRecorder( int rec, int dx, int dy, bool moveKids ){
 		}
 	}
 }
+
+// ------------------------
+void testApp::drawImage( ofImage * img, float x, float y, bool selected, float overlay ){
+	ofEnableAlphaBlending();	
+	ofSetColor( 0x999999 ); 
+	img->draw( x, y );
+	
+	ofFill(); 
+	ofSetColor( 255, 255, 255, overlay ); 
+	ofRect( x + 0.5, y + 0.5, 18, 18 ); 
+	
+	ofNoFill(); 
+	ofSetColor( 120, 120, 120 ); 
+	ofRect( x + 0.5, y + 0.5, 18, 18 ); 
+		
+	ofDisableAlphaBlending();
+	
+	if( selected ){
+		ofSetColor( 220, 220, 220 ); 
+		ofRect( x + 0.5, y + 0.5, 18, 18 ); 
+	}
+}
+
 
 // ------------------------
 bool testApp::inRect( float pX, float pY, float x, float y, float width, float height ){
