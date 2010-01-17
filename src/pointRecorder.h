@@ -34,9 +34,11 @@ class pointRecorder {
 		void draw();
 		void reset( int beatMod );
 		float getDuration();
-		
+		void applyOffset(); 
+	
 		ofPoint getPointForTime(float time);
 		ofPoint getVelocityForTime(float time);
+		
 		
 		float				startTime;
 		int					maxNumPts;
@@ -49,6 +51,10 @@ class pointRecorder {
 		
 		vector <int> kids;
 		vector <int> kidPointNr; // at which point of the line do we attach? 
+	
+		int offsetX; 
+		int offsetY; 
+		
 };
 
 #endif // POINT_RECORDER_H

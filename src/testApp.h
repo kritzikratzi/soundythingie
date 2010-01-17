@@ -29,6 +29,7 @@ class testApp : public ofSimpleApp{
 		void pairUpWithAnyPlayer( pointRecorder * pr ); 
 		void deleteRecorder( int rec ); 
 		void deleteRecordersKids( int rec ); 
+		void moveRecorder( int rec, int dx, int dy, bool moveKids ); 
 	
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
 		bool inPoly( ofPoint *polygon, int N, ofPoint p ); 
@@ -64,8 +65,12 @@ class testApp : public ofSimpleApp{
 		int beatMod; 
 		
 		
-		
-		
+		// variables to get the mouse position from the previous frame... 
+		int cmouseX; // current mouseX
+		int cmouseY; // current mouseY
+		int pmouseX; // previous mouseX
+		int pmouseY; // previous mouseY
+	
 		// mouse focus? 
 		int spawnFocusRecorder; 
 		int spawnFocusPoint; 
@@ -82,13 +87,18 @@ class testApp : public ofSimpleApp{
 		bool useEnvelope; 
 		bool chromaticMode; 
 		bool selectionMode;	
-		int lineToDelete; 
+		int lineHovered; 
 	
 	
 		// selection mode: 
 		ofPoint selection[1000]; 
 		int selectionLength;
 		vector <int> selectedRecorders; 
+	
+		float lastMousePressed; 
+	
+		// glut keyboard modifiers (case glutGetModifiers() can't be called from within mouseDragged() )
+		int glutModifiers; 
 };
 
 

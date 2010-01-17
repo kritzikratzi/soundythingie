@@ -5,6 +5,8 @@
 pointRecorder::pointRecorder(){
 	maxNumPts = 5000;  // try 50, for example....
 	startTime = 0;
+	offsetX = 0; 
+	offsetY = 0; 
 }
 
 //------------------------------------------------------------------
@@ -24,6 +26,8 @@ void pointRecorder::draw() {
 	if (bAmRecording)		ofSetColor(255,255,0);
 	else					ofSetColor(80,80,80);
 	
+	ofPushMatrix();
+	ofTranslate( offsetX, offsetY, 0 ); 
 	ofNoFill();
 	ofBeginShape();
 	for (int i = 0; i < pts.size(); i++){
@@ -37,6 +41,7 @@ void pointRecorder::draw() {
 		float radius = 2+2*volume/0.1;
 		ofCircle( pts[0].pos.x, pts[0].pos.y, radius ); 
 	}
+	ofPopMatrix(); 
 	
 	
 }
@@ -66,15 +71,20 @@ void pointRecorder::addPoint(ofPoint pt) {
 
 //------------------------------------------------------------------
 void pointRecorder::reset( int beatMod ) {
-	this->pts.clear();
-	this->bAmRecording = true;
 	this->beatMod = beatMod; 
-	this->volume = 0.1f;
-	this->startTime = 0; 
+
+	offsetX = 0; 
+	offsetY = 0; 
+	bAmRecording = true;
+	volume = 0.1f;
+	startTime = 0; 
 	
-	this->kids.clear(); 
-	this->kidPointNr.clear(); 
+	pts.clear();
+	kids.clear(); 
+	kidPointNr.clear(); 
 }
+
+
 
 //------------------------------------------------------------------
 float pointRecorder::getDuration() {
@@ -85,6 +95,22 @@ float pointRecorder::getDuration() {
 	return totalDuration;
 }
 
+
+
+//------------------------------------------------------------------
+void pointRecorder::applyOffset(){
+	for( int i = 0; i < pts.size(); i++ ){
+		pts[i].pos.x += offsetX; 
+		pts[i].pos.y += offsetY; 
+	}
+	
+	offsetX = 0; 
+	offsetY = 0; 
+}
+
+
+
+//------------------------------------------------------------------
 ofPoint pointRecorder::getPointForTime(float time){
 	
 	// ok here's how to do it.

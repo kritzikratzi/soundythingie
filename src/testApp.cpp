@@ -19,7 +19,7 @@ void testApp::setup(){
 	
 	timeCounter			= 0;
 	timeOfLastFrame		= ofGetElapsedTimef();
-	
+	lastMousePressed = 0; 
 	// ------------------------------------ audio stuff: 
 	// 2 output channels, 
 	// 0 input channels
@@ -41,7 +41,7 @@ void testApp::setup(){
 	spawnFocusRecorder = -1; 
 
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
-	lineToDelete = -1; 
+	lineHovered = -1; 
 	beatMod = 32; 
 	
 	chromaticMode = false; 
@@ -63,6 +63,12 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
+	pmouseX = cmouseX; 
+	pmouseY = cmouseY; 
+	cmouseX = mouseX; 
+	cmouseY = mouseY; 
+	
+	
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].update(); 
@@ -123,6 +129,30 @@ void testApp::draw(){
 		Tones::draw(); 
 	}
 	
+	pointRecorder *pr; 
+	ofPoint *pt; 
+	ofPoint *pt2; 
+	// draw relations between recorders
+	glEnable(GL_LINE_STIPPLE);
+	glLineStipple( 1, 0xF0F0 ); 
+	ofSetColor( 80, 80, 80 ); 
+	for( int i = 0; i < RECORDERS; i++ ){
+		pr = &recorders[i]; 
+		if( pr->startTime != 0 ){
+			for( int j = 0; j < pr->kids.size(); j++ ){
+				if( recorders[pr->kids[j]].pts.size() > 0 ){
+					pt = &pr->pts[pr->kidPointNr[j]].pos; 
+					pt2 = &recorders[pr->kids[j]].pts[0].pos;
+					ofNoFill(); 
+					ofLine( pt->x, pt->y, pt2->x, pt2->y ); 
+					ofFill(); 
+					ofCircle( pt->x, pt->y, 2 ); 
+				}
+			}
+		}
+	}
+	glDisable(GL_LINE_STIPPLE);
+	// draw recorders
 	for( int i = 0; i < RECORDERS; i++ ){
 		if( recorders[i].startTime != 0 ){
 			recorders[i].draw(); 
@@ -207,11 +237,11 @@ void testApp::draw(){
 		ofCircle( pr->pts[0].pos.x, pr->pts[0].pos.y, radius ); 
 	}
 	
-	if( lineToDelete >= 0 ){
+	if( lineHovered >= 0 ){
 		ofFill(); 
 		ofSetColor( 255, 0, 0 );
-		float radius = 2+2*recorders[lineToDelete].volume/0.1;
-		ofCircle( recorders[lineToDelete].pts[0].pos.x, recorders[lineToDelete].pts[0].pos.y, radius ); 
+		float radius = 2+2*recorders[lineHovered].volume/0.1;
+		ofCircle( recorders[lineHovered].pts[0].pos.x, recorders[lineHovered].pts[0].pos.y, radius ); 
 	}
 	
 	if( spawnFocusPoint >= 0 ){
@@ -255,6 +285,7 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
+	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
 	
 	
 	// set beat-mod using the keyboard
@@ -275,9 +306,9 @@ void testApp::keyPressed  (int key){
 	
 	
 	if( key == '-' ){
-		if( lineToDelete >= 0 ){
-			recorders[lineToDelete].volume -= 0.01; 
-			if( recorders[lineToDelete].volume < 0 ) recorders[lineToDelete].volume = 0; 
+		if( lineHovered >= 0 ){
+			recorders[lineHovered].volume -= 0.01; 
+			if( recorders[lineHovered].volume < 0 ) recorders[lineHovered].volume = 0; 
 		}
 		
 		for( int i = 0; i < selectedRecorders.size(); i++ ){
@@ -287,9 +318,9 @@ void testApp::keyPressed  (int key){
 	}
 
 	if( key == '+' ){
-		if( lineToDelete >= 0 ){
-			recorders[lineToDelete].volume += 0.01; 
-			if( recorders[lineToDelete].volume > 1 ) recorders[lineToDelete].volume = 1; 
+		if( lineHovered >= 0 ){
+			recorders[lineHovered].volume += 0.01; 
+			if( recorders[lineHovered].volume > 1 ) recorders[lineHovered].volume = 1; 
 		}
 		
 		for( int i = 0; i < selectedRecorders.size(); i++ ){
@@ -300,8 +331,8 @@ void testApp::keyPressed  (int key){
 	
 	if( key == 'd' || key == 127 ){
 		// delete the one recorder being hovered, eventually... 
-		if( lineToDelete >= 0 ){
-			deleteRecorder( lineToDelete ); 
+		if( lineHovered >= 0 ){
+			deleteRecorder( lineHovered ); 
 		}
 		
 		// delete all recorders in the selection
@@ -311,6 +342,7 @@ void testApp::keyPressed  (int key){
 		
 		// empty selection! 
 		selectedRecorders.clear(); 
+		cout << "CLEARED SEL REC: " << selectedRecorders.size() << endl; 
 	}
 	
 	if( key == 'f' ){
@@ -344,7 +376,6 @@ void testApp::keyPressed  (int key){
 	if( key == 'i' ){ // invert selection
 		vector<int> temp; 
 		for( int i = 0; i < selectedRecorders.size(); i++ ) temp.push_back( selectedRecorders[i] ); 
-		sort( temp.begin(), temp.end() ); 
 		selectedRecorders.clear(); 
 		
 		for( int i = 0; i < RECORDERS; i++ ){
@@ -361,6 +392,9 @@ void testApp::keyPressed  (int key){
 
 //--------------------------------------------------------------
 void testApp::keyReleased  (int key){
+	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
+
+	
 	if( key == 't' ){
 		chromaticMode = false; 
 	}
@@ -368,7 +402,7 @@ void testApp::keyReleased  (int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-	lineToDelete = -1; 
+	lineHovered = -1; 
 	
 	// are we really really close to a line? 
 	if( whichRecorder == -1 ){
@@ -380,7 +414,7 @@ void testApp::mouseMoved(int x, int y ){
 				float dy = mouseY - recorders[i].pts[0].pos.y; 
 				
 				if( sqrt( dx*dx + dy*dy ) < 5 ){
-					lineToDelete = i; 
+					lineHovered = i; 
 					break; 
 				}
 			}
@@ -390,7 +424,7 @@ void testApp::mouseMoved(int x, int y ){
 	spawnFocusPoint = -1; 
 	spawnFocusRecorder = -1; 
 	
-	if( lineToDelete == -1 && whichRecorder == -1 ){
+	if( lineHovered == -1 && whichRecorder == -1 ){
 		float minDistance = 100; 
 		float distance = 100;
 		float dx, dy; 
@@ -420,6 +454,24 @@ void testApp::mouseDragged(int x, int y, int button){
 		y = Tones::snap( y ); 
 	}
 	
+	if( lineHovered >= 0 ){
+		bool moveKids = (glutModifiers & GLUT_ACTIVE_ALT) == 0; 
+		cout << glutModifiers << endl; 
+		cout << "move kids? " << moveKids << endl; 
+		moveRecorder( lineHovered, cmouseX - pmouseX, cmouseY - pmouseY, moveKids ); 
+		
+		for( int i = 0; i < selectedRecorders.size(); i++ ){
+			if( i != lineHovered )
+				moveRecorder( selectedRecorders[i], cmouseX - pmouseX, cmouseY - pmouseY, moveKids ); 
+		}
+		
+		for( int i =0; i < RECORDERS; i++ ){
+			if( recorders[i].startTime > 0 )
+				recorders[i].applyOffset(); 
+		}
+		
+	}
+	
 	if( selectionMode ){
 		selection[selectionLength].x = x; 
 		selection[selectionLength].y = y; 
@@ -431,10 +483,20 @@ void testApp::mouseDragged(int x, int y, int button){
 	if( whichRecorder >= 0 ){
 		recorders[whichRecorder].addPoint( ofPoint(x,y,0) );
 	}
+	
+	
+	// mouseDragged sometimes gets called twice in between 
+	// the updartes. 
+	// yes, this is an issue! ... 
+	pmouseX = cmouseX; 
+	pmouseY = cmouseY; 
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
+	lastMousePressed = ofGetElapsedTimef(); 
+	
 	if( chromaticMode ){
 		y = Tones::snap( y ); 
 	}
@@ -446,9 +508,13 @@ void testApp::mousePressed(int x, int y, int button){
 		selectionLength++; 
 		return; 
 	}
-	
+
 	if( !selectionMode && selectedRecorders.size() > 0 ){
-		selectedRecorders.clear(); 
+		// Only clear recorders if no line is hovered, otherwise it's
+		// perfectly fine to delete! 
+		if( lineHovered < 0 ){
+			selectedRecorders.clear(); 
+		}
 	}
 	
 	
@@ -470,8 +536,10 @@ void testApp::mousePressed(int x, int y, int button){
 	}
 	
 	
-	if( lineToDelete >= 0 ){
-		deleteRecorder( lineToDelete ); 
+	if( lineHovered >= 0 ){
+		//deleteRecorder( lineHovered ); 
+		//mouseX
+		
 		return; 
 	}
 	
@@ -501,29 +569,34 @@ void testApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(){
+	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
+
 	if( chromaticMode ){
 		mouseY = Tones::snap( mouseY ); 
 	}
 	
 	if( selectionMode ){
 		for( int i = 0; i < RECORDERS; i++ ){
-			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
-				if( inPoly( selection, selectionLength, recorders[i].pts[0].pos ) ){
-					// already selected? 
-					bool found = false; 
-					for( int j = 0; j < selectedRecorders.size(); j++ ){
-						if( selectedRecorders[j] == i ) found = true; 
-					}
-					
-					if( !found ) selectedRecorders.push_back( i ); 
-				}
+			pointRecorder *pr = &recorders[i]; 
+			if( pr->startTime != 0 && pr->pts.size() > 0 && inPoly( selection, selectionLength, pr->pts[0].pos ) ){
+				selectedRecorders.push_back( i );
 			}
 		}
+		
+		// sort and shrink!
+		sort( selectedRecorders.begin(), selectedRecorders.end() ); 
+		unique( selectedRecorders.begin(), selectedRecorders.end() );
 		
 		selectionMode = false; 
 		
 		return; 
 	}
+	
+	if( lineHovered >= 0 && ofGetElapsedTimef() - lastMousePressed < 0.1 ){
+		deleteRecorder( lineHovered ); 
+		lineHovered = -1; 
+	}
+	
 	
 	
 	if( whichRecorder >= 0 ){
@@ -603,7 +676,7 @@ void testApp::deleteRecorder( int rec ){
 		}
 	}
 	
-	lineToDelete = -1; 
+	lineHovered = -1; 
 	return; 
 }
 
@@ -612,6 +685,18 @@ void testApp::deleteRecordersKids( int rec ){
 	for( int j = 0; j < recorders[rec].kids.size(); j++ ){
 		recorders[recorders[rec].kids[j]].startTime = 0;
 		deleteRecordersKids( recorders[rec].kids[j] ); 
+	}
+}
+
+// ------------------------
+void testApp::moveRecorder( int rec, int dx, int dy, bool moveKids ){
+	recorders[rec].offsetX = dx;
+	recorders[rec].offsetY = dy; 
+	
+	if( moveKids ){
+		for( int i = 0; i < recorders[rec].kids.size(); i++ ){
+			moveRecorder( recorders[rec].kids[i], dx, dy, true ); 
+		}
 	}
 }
 

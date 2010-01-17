@@ -44,3 +44,5 @@ TODO:
 - when curve is delete remove it along with the last runner
 - make runners friendlier? 
 - kids spawn off with the beat-subdivision that is selected (e.g. 0=1-> every single one, 2->every second one, etc.) 
+- add motion to the lines themselves
+- when hovering over a potential spawn allow pressing "alt" to draw anywhere
