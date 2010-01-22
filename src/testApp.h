@@ -105,6 +105,10 @@ class testApp : public ofSimpleApp{
 	
 		// glut keyboard modifiers (case glutGetModifiers() can't be called from within mouseDragged() )
 		int glutModifiers; 
+	
+	
+		bool toConsole; 
+		bool holdNeighbour; 
 };
 
 

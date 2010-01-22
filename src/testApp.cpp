@@ -59,6 +59,9 @@ void testApp::setup(){
 	shapeImgs[3].loadImage( "shape_rectangle.png" ); 
 	envelopeImg.loadImage( "envelope.png" ); 
 	selectionImg.loadImage( "selection.png" ); 
+	
+	toConsole = false; 
+	holdNeighbour = false; 
 } 
 
 //--------------------------------------------------------------
@@ -290,6 +293,15 @@ void testApp::keyPressed  (int key){
 		beatMod = 0; 
 	}
 	
+	if( key == ' ' ){
+		toConsole = !toConsole; 
+	}
+	
+	if( key == 'h' ){
+		holdNeighbour = true; 
+		return; 
+	}
+	
 	if( key == 'c' ){
 		for( int i = 0; i < RECORDERS; i++ ){
 			//recorders[i].clear(); 
@@ -389,6 +401,10 @@ void testApp::keyReleased  (int key){
 	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
 
 	
+	if( key == 'h' ){
+		holdNeighbour = false; 
+	}
+	
 	if( key == 't' ){
 		chromaticMode = false; 
 	}
@@ -413,6 +429,10 @@ void testApp::mouseMoved(int x, int y ){
 				}
 			}
 		}
+	}
+	
+	if( holdNeighbour ){
+		return; 
 	}
 	
 	spawnFocusPoint = -1; 
@@ -645,6 +665,15 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 		lAudio[i] = output[i*nChannels]; 
 		rAudio[i] = output[i*nChannels+1]; 
 	}
+	
+	if( toConsole ){
+		cout << "-----------------------" << endl; 
+		for( int i = 0; i < 256; i++ ){
+			cout << output[i*nChannels] << ":" << output[i*nChannels+1] << ", "; 
+		}
+		cout << endl; 
+	}
+	
 }
 
 
