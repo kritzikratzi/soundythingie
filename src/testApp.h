@@ -32,9 +32,9 @@ class testApp : public ofSimpleApp{
 		void mousePressed(int x, int y, int button);
 		void mouseReleased();
 		void pairUpWithAnyPlayer( pointRecorder * pr ); 
-		void deleteRecorder( int rec ); 
-		void deleteRecordersKids( int rec ); 
-		void moveRecorder( int rec, int dx, int dy, bool moveKids ); 
+		void deleteRecorder( pointRecorder * rec ); 
+		void deleteRecordersKids( pointRecorder * rec ); 
+		void moveRecorder( pointRecorder * rec, int dx, int dy, bool moveKids ); 
 		void drawImage( ofImage * img, float x, float y, bool selected = false, float overlay = 0 );
 	
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
@@ -67,17 +67,10 @@ class testApp : public ofSimpleApp{
 		pointRecorder recorders[RECORDERS];
 		pointPlayer players[PLAYERS];
 		
-		int whichRecorder; 
 		int beatMod; 
 		int soundShape; 
 		
 		
-		// variables to get the mouse position from the previous frame... 
-		int cmouseX; // current mouseX
-		int cmouseY; // current mouseY
-		int pmouseX; // previous mouseX
-		int pmouseY; // previous mouseY
-	
 		// mouse focus? 
 		int spawnFocusRecorder; 
 		int spawnFocusPoint; 
@@ -93,22 +86,28 @@ class testApp : public ofSimpleApp{
 		bool useEnvelope; 
 		bool chromaticMode; 
 		bool selectionMode;	
-		int lineHovered; 
+		bool holdSpawnMode; // "hold spawn" mode
 	
+		// which recorder are we currently hovering over, or null
+		pointRecorder * hovering; 
+	
+		// which recorder are we currently recording into, or null
+		pointRecorder * recording; 
 	
 		// selection mode: 
-		ofPoint selection[1000]; 
-		int selectionLength;
-		vector <int> selectedRecorders; 
+		ofPoint selectionPoly[1000]; 
+		int selectionPolyLength;
+		vector <pointRecorder *> selection; 
 	
+		// When was the mouse last pressed, and where? 
 		float lastMousePressed; 
 	
 		// glut keyboard modifiers (case glutGetModifiers() can't be called from within mouseDragged() )
 		int glutModifiers; 
 	
-	
+		// Outputs generated sound-waves to console! 
 		bool toConsole; 
-		bool holdNeighbour; 
+	
 };
 
 

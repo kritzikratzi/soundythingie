@@ -49,7 +49,7 @@ class pointRecorder {
 		int beatMod; 
 		float volume;
 		
-		vector <int> kids;
+		vector <pointRecorder*> kids;
 		vector <int> kidPointNr; // at which point of the line do we attach? 
 	
 		int offsetX; 
