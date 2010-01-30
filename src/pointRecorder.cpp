@@ -82,6 +82,9 @@ void pointRecorder::reset( int beatMod ) {
 	pts.clear();
 	kids.clear(); 
 	kidPointNr.clear(); 
+	
+	babysitter = NULL; 
+	babysitting.clear(); 
 }
 
 

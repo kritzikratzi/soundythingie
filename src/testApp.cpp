@@ -465,7 +465,8 @@ void testApp::mouseDragged(int x, int y, int button){
 		y = Tones::snap( y ); 
 	}
 	
-	if( hovering != NULL ){
+	// move, but only if shift is not pressed! 
+	if( hovering != NULL && ( glutModifiers & GLUT_ACTIVE_SHIFT ) == 0 ){
 		bool moveKids = (glutModifiers & GLUT_ACTIVE_ALT) == 0; 
 		cout << glutModifiers << endl; 
 		cout << "move kids? " << moveKids << endl; 
@@ -481,7 +482,7 @@ void testApp::mouseDragged(int x, int y, int button){
 		for( int i =0; i < RECORDERS; i++ ){
 			if( recorders[i].startTime > 0 )
 				recorders[i].applyOffset(); 
-		}		
+		}
 	}
 	
 	if( selectionMode ){
@@ -543,10 +544,12 @@ void testApp::mousePressed(int x, int y, int button){
 	
 	
 	if( hovering != NULL ){
-		//deleteRecorder( lineHovered ); 
-		//mouseX
-		
-		return; 
+		// usually we wanna abort here, 
+		// but if shift is pressed we generously 
+		// allow to continue for the parenting feature to work. 
+		if( ( glutModifiers & GLUT_ACTIVE_SHIFT ) == 0 ){
+			return; 
+		}
 	}
 	
 	// start recording! 
@@ -556,7 +559,7 @@ void testApp::mousePressed(int x, int y, int button){
 			recording->reset( this->beatMod ); 
 			recording->soundShape = soundShape; 
 			
-			// Are we someone's kid? 
+			// we're someone's spawn? 
 			if( spawnFocusRecorder >= 0 ){
 				pointRecorder * rec = &recorders[spawnFocusRecorder]; 
 				rec->kids.push_back( recording ); 
@@ -565,6 +568,11 @@ void testApp::mousePressed(int x, int y, int button){
 				ofPoint p = rec->pts[spawnFocusPoint].pos; 
 				recording->addPoint( p );
 				recording->beatMod = -1; // this will never launch it's own players! 
+			}
+			// parenting someone? 
+			else if( hovering ){
+				recording->babysitting.push_back( hovering );
+				hovering->babysitter = recording; 
 			}
 			
 			return; 
@@ -619,6 +627,13 @@ void testApp::mouseReleased(){
 		}
 		else{
 			recording->reset( this->beatMod ); 
+			
+			// if this was anyone's babysitter then remove it! 
+			for( int i = 0; i < RECORDERS; i++ ){
+				if( recorders[i].babysitter = recording ){
+					recorders[i].babysitter = NULL; 
+				}
+			}
 		}
 		
 		timeCounter = 0;

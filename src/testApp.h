@@ -66,6 +66,7 @@ class testApp : public ofSimpleApp{
 	
 		pointRecorder recorders[RECORDERS];
 		pointPlayer players[PLAYERS];
+		vector<pointRecorder *> playersOfRecorders[RECORDERS]; 
 		
 		int beatMod; 
 		int soundShape; 
@@ -87,13 +88,13 @@ class testApp : public ofSimpleApp{
 		bool chromaticMode; 
 		bool selectionMode;	
 		bool holdSpawnMode; // "hold spawn" mode
-	
+		
 		// which recorder are we currently hovering over, or null
 		pointRecorder * hovering; 
 	
 		// which recorder are we currently recording into, or null
 		pointRecorder * recording; 
-	
+		
 		// selection mode: 
 		ofPoint selectionPoly[1000]; 
 		int selectionPolyLength;

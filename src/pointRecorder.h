@@ -49,9 +49,15 @@ class pointRecorder {
 		int beatMod; 
 		float volume;
 		
+		// A line might have an arbitrary number of kids... 
 		vector <pointRecorder*> kids;
 		vector <int> kidPointNr; // at which point of the line do we attach? 
 	
+		// A line might be parenting another line... 
+		vector <pointRecorder*> babysitting; // If this line is the parent of another line we store that other line here (who's being babysitted?)
+		pointRecorder * babysitter; // If a line is being parented by another line we store that other line here (who's the babysitter?)
+		
+		
 		int offsetX; 
 		int offsetY; 
 		int soundShape; 
