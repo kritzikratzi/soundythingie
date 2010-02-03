@@ -667,13 +667,27 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 	
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
-			players[i].audioRequested( output, bufferSize, nChannels, useEnvelope ); 
+			if( players[i].pr->babysitting.size() > 0 ){
+				vector<pointRecorder*> * vec = &players[i].pr->babysitting; 
+				ofPoint * targetPos = &players[i].currentPoint; 
+				for (vector<pointRecorder *>::iterator pr = vec->begin(); pr != vec->end(); ++pr ){
+					this->moveRecorder( *pr, targetPos->x-(*pr)->pts[0].pos.x, targetPos->y-(*pr)->pts[0].pos.y, true ); 
+				}
+				
+				for( int i =0; i < RECORDERS; i++ ){
+					if( recorders[i].startTime > 0 )
+						recorders[i].applyOffset(); 
+				}
+			}
+			else{
+				players[i].audioRequested( output, bufferSize, nChannels, useEnvelope ); 
+			}
 		}
 	}
 	
 	for( int i = 0; i < 256; i++ ){
-		lAudio[i] = output[i*nChannels]; 
-		rAudio[i] = output[i*nChannels+1]; 
+		lAudio[i] = fmin( +2, fmax( -2, output[i*nChannels] ) );  
+		rAudio[i] = fmin( +2, fmax( -2, output[i*nChannels+1] ) ); 
 	}
 	
 	if( toConsole ){

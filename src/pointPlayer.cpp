@@ -204,7 +204,7 @@ void pointPlayer::doCrazyMath( bool apply ){
 	//targetFrequency = 5000.0f * heightPct;
 	targetFrequency = Tones::fValue( pt.y ); 
 	phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
-
+	
 	
 	if( apply ){
 		phaseAdder = phaseAdderTarget; 
