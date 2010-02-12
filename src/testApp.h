@@ -109,6 +109,11 @@ class testApp : public ofSimpleApp{
 		// Outputs generated sound-waves to console! 
 		bool toConsole; 
 	
+	
+		// bpm rates
+		int bpmRates[6];
+		float bpmLastTriggered[6]; 
+		bool bpmTriggerNow[6]; 
 };
 
 

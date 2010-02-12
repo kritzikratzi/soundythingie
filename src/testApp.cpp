@@ -42,7 +42,7 @@ void testApp::setup(){
 	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	hovering = NULL; 
 	recording = NULL; 
-	beatMod = 32; 
+	beatMod = 1; 
 	soundShape = 1; 
 	
 	chromaticMode = false; 
@@ -66,6 +66,13 @@ void testApp::setup(){
 	
 	toConsole = false; 
 	holdSpawnMode = false; 
+	
+	bpmRates[0] =   0; bpmLastTriggered[0] = 0; bpmTriggerNow[0] = false;  
+	bpmRates[5] =  20; bpmLastTriggered[1] = 0; bpmTriggerNow[1] = false;  
+	bpmRates[4] =  30; bpmLastTriggered[2] = 0; bpmTriggerNow[2] = false;  
+	bpmRates[3] =  40; bpmLastTriggered[3] = 0; bpmTriggerNow[3] = false;  
+	bpmRates[2] =  60; bpmLastTriggered[4] = 0; bpmTriggerNow[4] = false;  
+	bpmRates[1] = 120; bpmLastTriggered[5] = 0; bpmTriggerNow[5] = false;  
 } 
 
 //--------------------------------------------------------------
@@ -78,11 +85,26 @@ void testApp::update(){
 	}
 	
 	
+	// which bpm rates should be triggered? 
+	for( int i = 1; i < 6; i++ ){
+		if( bpmLastTriggered[i] + 60.0/bpmRates[i] <= ofGetElapsedTimef() ){
+			// This is not perfect, but should work for now... 
+			bpmLastTriggered[i] += 60.0/bpmRates[i]; 
+			bpmTriggerNow[i] = true; 
+			triggerAlpha[i] = 1; 
+		}
+		else{
+			bpmTriggerNow[i] = false; 
+			triggerAlpha[i] -= triggerAlpha[i]/(10+i*2.0); 
+		}
+	}
 	
 	// trigger players! 
 	for( int i = 0; i < RECORDERS; i++ ){
-		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].startTime != 0 && ofGetFrameNum() % recorders[i].beatMod == 0 ){
-			pairUpWithAnyPlayer( &recorders[i] ); 
+		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].startTime != 0 ){
+			if( bpmTriggerNow[ recorders[i].beatMod ] ){
+				pairUpWithAnyPlayer( &recorders[i] ); 
+			}
 		}
 	}
 	
@@ -107,16 +129,6 @@ void testApp::update(){
 					}
 				}
 			}
-		}
-	}
-	
-	
-	// trigger-fade-effect for the beat-mod selectors (no one understands what i mean, right?) 
-	for( int i = 1; i < 6; i++ ){
-		triggerAlpha[i] -= triggerAlpha[i]/(10+i*2.0); 
-		
-		if( ofGetFrameNum() % (16<<i) == 0 ){
-			triggerAlpha[i] = 1; 
 		}
 	}
 }
@@ -171,7 +183,7 @@ void testApp::draw(){
 		int alpha = 120*triggerAlpha[i];
 		bool selected = 
 			this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
-			(16<<i) == beatMod || (beatMod == 0 && i == 0 ); // selected
+			i == beatMod; // selected
 
 		drawImage( &beatImgs[i], 10, 10+i*30, selected, alpha ); 
 		
@@ -283,15 +295,18 @@ void testApp::keyPressed  (int key){
 	
 	
 	// set beat-mod using the keyboard
-	if( key >= '1' && key <= '5' ){
-		beatMod = 32<<(key-'1'); 
-	}
-	else if( key == '0' ){
-		beatMod = 0; 
+	if( key >= '0' && key <= '5' ){
+		beatMod = key - '0';
 	}
 	
 	if( key == ' ' ){
 		toConsole = !toConsole; 
+	}
+	
+	if( key == 9 /* tab */ ){
+		for( int i = 1; i < 6; i++ ){
+			bpmLastTriggered[i] = ofGetElapsedTimef(); 
+		}
 	}
 	
 	if( key == 'h' ){
@@ -530,7 +545,7 @@ void testApp::mousePressed(int x, int y, int button){
 	if( mouseX <= 30 ){
 		for( int i = 0; i < 6; i++ ){
 			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 10+i*30.0, 20.0, 20.0 ) ){
-				beatMod = i==0? 0 : (16<<i); 
+				beatMod = i; 
 				return;
 			}
 		}
@@ -569,7 +584,7 @@ void testApp::mousePressed(int x, int y, int button){
 				recording->addPoint( p );
 				recording->beatMod = -1; // this will never launch it's own players! 
 			}
-			// parenting someone? 
+			// parenting someone?       
 			else if( hovering ){
 				recording->babysitting.push_back( hovering );
 				hovering->babysitter = recording; 
