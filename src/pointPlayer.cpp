@@ -81,7 +81,13 @@ void pointPlayer::update(){
 void pointPlayer::draw(){
 	if( suicide ) return; 
 	
-	ofSetColor(255,255,255);
+	if( this->pr->babysitting.size() > 0 ){
+		// not actually a "runner", because we babysit another line. 
+		// no need to draw! 
+		return; 
+	}
+	
+	ofSetColor(255,255,255); 
 	ofFill();
 	ofSetRectMode(OF_RECTMODE_CENTER);
 	// if we are not recording, get the point for a given time: 

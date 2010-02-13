@@ -26,6 +26,10 @@ void pointRecorder::draw() {
 	if (bAmRecording)		ofSetColor(255,255,0);
 	else					ofSetColor(80,80,80);
 	
+	if( babysitting.size() > 0 ){
+		glEnable(GL_LINE_STIPPLE);
+		glLineStipple( 1, 0x2222 ); 
+	}		
 	ofPushMatrix();
 	ofTranslate( offsetX, offsetY, 0 ); 
 	ofNoFill();
@@ -35,6 +39,7 @@ void pointRecorder::draw() {
 	}
 	
 	ofEndShape(false);
+	glDisable(GL_LINE_STIPPLE);
 	
 	if( pts.size() > 1 ){
 		ofFill(); 
