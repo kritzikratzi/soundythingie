@@ -19,6 +19,7 @@ pointPlayer::pointPlayer(){
 	idCount++; 
 	
 	suicide = true; 
+	dead = true; 
 }
 
 void pointPlayer::setup( pointRecorder * pr ){
@@ -29,6 +30,7 @@ void pointPlayer::setup( pointRecorder * pr ){
 	sampleRate 			= 44100;
 	timeCounter			= 0; 
 	suicide				= false; 
+	dead				= false; 
 	timeOfLastFrame		= ofGetElapsedTimef(); 
 	
 	// calculate attack and release time (50ms)
@@ -51,17 +53,7 @@ void pointPlayer::update(){
 	if ( this->pr != NULL && this->pr->bAmRecording == false && this->pr->pts.size() > 1){
 		if( timeCounter >= this->pr->getDuration() ){
 			// kill myself? 
-			if( this->pr->beatMod == 0 && this->pr->startTime != 0 ){
-				// reboot, beatless shit! 
-				timeCounter = 0; 
-				doCrazyMath( true ); 
-				// get updated volume! 
-				this->volume = this->pr->volume; 
-			}
-			else{
-				// DIE BECAUSE OF AGE! 
-				suicide = true; 
-			}
+			suicide = true; 
 		}
 		else{
 			doCrazyMath( false ); 

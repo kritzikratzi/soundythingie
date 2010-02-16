@@ -42,6 +42,7 @@ class pointPlayer{
 		float   envelopeScale;
 		
 		bool	suicide; 
+		bool	dead; 
 		static int idCount; 
 		int id; 
 	

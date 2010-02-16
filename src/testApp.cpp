@@ -48,7 +48,10 @@ void testApp::setup(){
 	chromaticMode = false; 
 	selectionMode = false; 
 	holdSpawnMode = false; 
-	
+	toConsole = false; 
+	holdSpawnMode = false; 
+	triggerAlwaysMode = false; 
+		
 	
 	// load images...
 	beatImgs[0].loadImage( "beat_0.png" );
@@ -63,9 +66,8 @@ void testApp::setup(){
 	shapeImgs[3].loadImage( "shape_rectangle.png" ); 
 	envelopeImg.loadImage( "envelope.png" ); 
 	selectionImg.loadImage( "selection.png" ); 
-	
-	toConsole = false; 
-	holdSpawnMode = false; 
+	triggerAlwaysImg.loadImage( "trigger_always.png" ); 
+	triggerOnceImg.loadImage( "trigger_once.png" ); 
 	
 	bpmRates[0] =   0; bpmLastTriggered[0] = 0; bpmTriggerNow[0] = false;  
 	bpmRates[5] =  20; bpmLastTriggered[1] = 0; bpmTriggerNow[1] = false;  
@@ -73,6 +75,11 @@ void testApp::setup(){
 	bpmRates[3] =  40; bpmLastTriggered[3] = 0; bpmTriggerNow[3] = false;  
 	bpmRates[2] =  60; bpmLastTriggered[4] = 0; bpmTriggerNow[4] = false;  
 	bpmRates[1] = 120; bpmLastTriggered[5] = 0; bpmTriggerNow[5] = false;  
+	
+	for( int i = 0; i < RECORDERS; i++ ){
+		recorders[i].index = i; 
+	}
+	
 } 
 
 //--------------------------------------------------------------
@@ -81,6 +88,17 @@ void testApp::update(){
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].update(); 
+		}
+		else if( players[i].suicide && !players[i].dead ){
+			players[i].dead = true; 
+			vector<pointPlayer*> * them = &playersOfRecorders[ players[i].pr->index ]; 
+			for( int j = 0; j < them->size(); j++ ){
+				if( them->at(j) == &players[i] ){
+					cout << " removing player " << i << " from recorder " << players[i].pr->index << endl; 
+					them->erase( them->begin()+j ); 
+					break; 
+				}
+			}
 		}
 	}
 	
@@ -101,14 +119,26 @@ void testApp::update(){
 	
 	// trigger players! 
 	for( int i = 0; i < RECORDERS; i++ ){
-		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].active() ){
-			if( bpmTriggerNow[ recorders[i].beatMod ] ){
-				pairUpWithAnyPlayer( &recorders[i] ); 
+		if( !recorders[i].bAmRecording && recorders[i].active() ){
+			// Lines with beatMod 0 are only triggered if there is no 
+			// player already
+			if( recorders[i].beatMod == 0 ){
+				if( playersOfRecorders[i].size() == 0 ){
+					pairUpWithAnyPlayer( &recorders[i] ); 
+				}
+			}
+			// Lines with beatMod >0 are always triggered, except if they
+			// are babysitters for other lines then they also are triggered 
+			// only if there is no other line. 
+			else if( recorders[i].beatMod > 0 ){
+				if( bpmTriggerNow[ recorders[i].beatMod ] && ( recorders[i].triggerAlways == true || playersOfRecorders[i].size() == 0 ) ){
+					pairUpWithAnyPlayer( &recorders[i] ); 
+				}
 			}
 		}
 	}
 	
-	// trigger kids!
+	// and then trigger kids!
 	for( int i = 0; i < RECORDERS; i++ ){
 		if( recorders[i].kids.size() > 0 ){
 			
@@ -204,6 +234,9 @@ void testApp::draw(){
 		drawImage( &shapeImgs[i], 10, 220+i*30, selected ); 
 	}
 	
+	bool triggerHovering = this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 350.0, 20.0, 20.0 );
+	drawImage( triggerAlwaysMode?&triggerAlwaysImg:&triggerOnceImg, 10.0, 350.0, triggerHovering ); 
+	
 	// Draw point players
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
@@ -279,7 +312,9 @@ void testApp::draw(){
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 	for( int i = 0; i < PLAYERS; i++ ){
-		if( players[i].suicide ){
+		if( players[i].dead ){
+			cout << "Using player " << i << " for " << pr->index << " ------- " << playersOfRecorders[pr->index].size() << endl; 
+			playersOfRecorders[pr->index].push_back( &players[i] ); 
 			players[i].setup( pr ); 
 			return; 
 		}
@@ -573,17 +608,26 @@ void testApp::mousePressed(int x, int y, int button){
 	
 	// handle the buttons... 
 	if( mouseX <= 30 ){
+		// choosing beat 
 		for( int i = 0; i < 6; i++ ){
 			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 10+i*30.0, 20.0, 20.0 ) ){
 				beatMod = i; 
 				return;
 			}
 		}
+		
+		// choosing sound-shape
 		for( int i = 0; i < 4; i++ ){
 			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 220+i*30.0, 20.0, 20.0 ) ){
 				soundShape = i; 
 				return; 
 			}
+		}
+		
+		// change trigger-mode
+		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 350.0, 20.0, 20.0 ) ){
+			triggerAlwaysMode = !triggerAlwaysMode; 
+			return; 
 		}
 	}
 	
@@ -603,6 +647,7 @@ void testApp::mousePressed(int x, int y, int button){
 			recording = &recorders[i]; 
 			recording->reset( this->beatMod ); 
 			recording->soundShape = soundShape; 
+			recording->triggerAlways = triggerAlwaysMode; 
 			
 			// we're someone's spawn? 
 			if( spawnFocusRecorder >= 0 ){
@@ -617,6 +662,7 @@ void testApp::mousePressed(int x, int y, int button){
 			// parenting someone?       
 			else if( hovering ){
 				recording->babysitting.push_back( hovering );
+				recording->triggerAlways = false; 
 				hovering->babysitter = recording; 
 			}
 			
@@ -665,10 +711,6 @@ void testApp::mouseReleased(){
 		if( recording->pts.size() >= 1 ){
 			recording->addPoint( ofPoint(mouseX, mouseY,0) );
 			recording->bAmRecording = false;
-			
-			if( recording->beatMod == 0 ){
-				pairUpWithAnyPlayer( recording ); 
-			}
 		}
 		else{
 			recording->reset( this->beatMod ); 

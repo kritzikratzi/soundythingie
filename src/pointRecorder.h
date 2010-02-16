@@ -64,6 +64,8 @@ class pointRecorder {
 		int soundShape; 
 	
 		bool enabled; 
+		bool triggerAlways; 
+		int index; 
 	
 };
 

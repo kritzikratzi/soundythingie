@@ -66,7 +66,7 @@ class testApp : public ofSimpleApp{
 	
 		pointRecorder recorders[RECORDERS];
 		pointPlayer players[PLAYERS];
-		vector<pointRecorder *> playersOfRecorders[RECORDERS]; 
+		vector<pointPlayer *> playersOfRecorders[RECORDERS]; 
 		
 		int beatMod; 
 		int soundShape; 
@@ -81,6 +81,8 @@ class testApp : public ofSimpleApp{
 		ofImage shapeImgs[4]; 
 		ofImage envelopeImg; 
 		ofImage selectionImg; 
+		ofImage triggerAlwaysImg; 
+		ofImage triggerOnceImg; 
 		
 		// some modes... 
 		bool  	bFullscreen;
@@ -88,7 +90,8 @@ class testApp : public ofSimpleApp{
 		bool chromaticMode; 
 		bool selectionMode;	
 		bool holdSpawnMode; // "hold spawn" mode
-		
+		bool triggerAlwaysMode; // always trigger? 
+	
 		// which recorder are we currently hovering over, or null
 		pointRecorder * hovering; 
 	
