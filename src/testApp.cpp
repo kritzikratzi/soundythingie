@@ -101,7 +101,7 @@ void testApp::update(){
 	
 	// trigger players! 
 	for( int i = 0; i < RECORDERS; i++ ){
-		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].startTime != 0 ){
+		if( !recorders[i].bAmRecording && recorders[i].beatMod > 0 && recorders[i].active() ){
 			if( bpmTriggerNow[ recorders[i].beatMod ] ){
 				pairUpWithAnyPlayer( &recorders[i] ); 
 			}
@@ -167,7 +167,7 @@ void testApp::draw(){
 	
 	// draw recorders themselves
 	for( int i = 0; i < RECORDERS; i++ ){
-		if( recorders[i].startTime != 0 ){
+		if( recorders[i].active() ){
 			recorders[i].draw(); 
 		}
 	}
@@ -188,12 +188,12 @@ void testApp::draw(){
 		drawImage( &beatImgs[i], 10, 10+i*30, selected, alpha ); 
 		
 		// a little guide to show "where" in the beat we are
-		if( i != 0 ){
+		/*if( i != 0 ){
 			ofSetColor( 150, 150, 150 ); 
 			int beat = 16<<i;
 			float t = (ofGetFrameNum()%beat)/(float) beat; 
 			ofRect( 10.5 + t*18, 11.5 + i*30, 1, 0 ); 
-		}
+		}*/
 		
 	}
 	
@@ -292,8 +292,7 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
 	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
-	
-	
+
 	// set beat-mod using the keyboard
 	if( key >= '0' && key <= '5' ){
 		beatMod = key - '0';
@@ -397,7 +396,7 @@ void testApp::keyPressed  (int key){
 		selection.clear(); 
 		
 		for( int i = 0; i < RECORDERS; i++ ){
-			if( !binary_search( temp.begin(), temp.end(), &recorders[i] ) && recorders[i].startTime != 0 ){
+			if( !binary_search( temp.begin(), temp.end(), &recorders[i] ) && recorders[i].active() ){
 				selection.push_back( &recorders[i] ); 
 			}
 		}
@@ -405,6 +404,37 @@ void testApp::keyPressed  (int key){
 	
 	if( key == 't' ){
 		chromaticMode = true; 
+	}
+	
+	
+	if( key >= OF_KEY_F1 && key <= OF_KEY_F12 ){
+		int nr = key - OF_KEY_F1; 
+		
+		if( (glutModifiers & GLUT_ACTIVE_SHIFT ) == 0 ){
+			// enable/disable
+			setEnabled[nr] = !setEnabled[nr]; 
+			for (vector<pointRecorder *>::iterator pr = sets[nr].begin(); pr != sets[nr].end(); ++pr ){
+				(*pr)->enabled = setEnabled[nr]; 
+			}
+			
+			selection.clear(); 
+			if( setEnabled[nr] ){
+				for (vector<pointRecorder *>::iterator pr = sets[nr].begin(); pr != sets[nr].end(); ++pr ){
+					selection.push_back( (*pr) ); 
+				}
+				sort( selection.begin(), selection.end() ); 
+				unique( selection.begin(), selection.end() );
+			}
+		}
+		else{
+			sets[nr].clear(); 
+			for (vector<pointRecorder *>::iterator pr = selection.begin(); pr != selection.end(); ++pr ){
+				sets[nr].push_back( (*pr) ); 
+			}
+			
+			selection.clear(); 
+			setEnabled[nr] = true; 
+		}
 	}
 }
 
@@ -430,7 +460,7 @@ void testApp::mouseMoved(int x, int y ){
 	if( recording == NULL ){
 		float dx, dy; 
 		for( int i = 0; i < RECORDERS; i++ ){
-			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
+			if( recorders[i].active() && recorders[i].pts.size() > 0 ){
 				// are we really close to the first point? 
 				float dx = mouseX - recorders[i].pts[0].pos.x; 
 				float dy = mouseY - recorders[i].pts[0].pos.y; 
@@ -457,7 +487,7 @@ void testApp::mouseMoved(int x, int y ){
 		
 		
 		for( int i = 0; i < RECORDERS; i++ ){
-			if( recorders[i].startTime != 0 && recorders[i].pts.size() > 0 ){
+			if( recorders[i].active() && recorders[i].pts.size() > 0 ){
 				for( int j = 0; j < recorders[i].pts.size(); j++ ){
 					// are we really close to the first point? 
 					dx = mouseX - recorders[i].pts[j].pos.x; 
@@ -495,7 +525,7 @@ void testApp::mouseDragged(int x, int y, int button){
 		}
 		
 		for( int i =0; i < RECORDERS; i++ ){
-			if( recorders[i].startTime > 0 )
+			if( recorders[i].active() )
 				recorders[i].applyOffset(); 
 		}
 	}
@@ -610,7 +640,7 @@ void testApp::mouseReleased(){
 	if( selectionMode ){
 		for( int i = 0; i < RECORDERS; i++ ){
 			pointRecorder *pr = &recorders[i]; 
-			if( pr->startTime != 0 && pr->pts.size() > 0 && inPoly( selectionPoly, selectionPolyLength, pr->pts[0].pos ) ){
+			if( pr->active() && pr->pts.size() > 0 && inPoly( selectionPoly, selectionPolyLength, pr->pts[0].pos ) ){
 				selection.push_back( pr );
 			}
 		}
@@ -690,7 +720,7 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 				}
 				
 				for( int i =0; i < RECORDERS; i++ ){
-					if( recorders[i].startTime > 0 )
+					if( recorders[i].active() )
 						recorders[i].applyOffset(); 
 				}
 			}

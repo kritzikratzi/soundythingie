@@ -83,6 +83,7 @@ void pointRecorder::reset( int beatMod ) {
 	bAmRecording = true;
 	volume = 0.1f;
 	startTime = 0; 
+	enabled = true; 
 	
 	pts.clear();
 	kids.clear(); 
@@ -204,4 +205,8 @@ ofPoint pointRecorder::getVelocityForTime(float time){
 	velocity.y			= curPoint.y - prevPoint.y;
 	
 	return velocity;
+}
+
+bool pointRecorder::active(){
+	return startTime != 0 && enabled != 0; 
 }

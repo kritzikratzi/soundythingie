@@ -35,6 +35,7 @@ class pointRecorder {
 		void reset( int beatMod );
 		float getDuration();
 		void applyOffset(); 
+		bool active(); 
 	
 		ofPoint getPointForTime(float time);
 		ofPoint getVelocityForTime(float time);
@@ -61,6 +62,8 @@ class pointRecorder {
 		int offsetX; 
 		int offsetY; 
 		int soundShape; 
+	
+		bool enabled; 
 	
 };
 

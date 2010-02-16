@@ -114,8 +114,12 @@ class testApp : public ofSimpleApp{
 		int bpmRates[6];
 		float bpmLastTriggered[6]; 
 		bool bpmTriggerNow[6]; 
+	
+	
+		// sets... 
+		vector<pointRecorder *> sets[12]; 
+		bool setEnabled[12];
 };
 
 
 #endif
-
