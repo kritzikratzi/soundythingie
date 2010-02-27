@@ -20,6 +20,7 @@ pointPlayer::pointPlayer(){
 	
 	suicide = true; 
 	dead = true; 
+	startDelay = 0; 
 }
 
 void pointPlayer::setup( pointRecorder * pr ){
@@ -32,6 +33,8 @@ void pointPlayer::setup( pointRecorder * pr ){
 	suicide				= false; 
 	dead				= false; 
 	timeOfLastFrame		= ofGetElapsedTimef(); 
+	startTime			= ofGetElapsedTimef(); 
+	startDelay			= pr->startDelay; 
 	
 	// calculate attack and release time (50ms)
 	attackTime = fmin( 0.1, this->pr->getDuration()/10 ); // max 0.1s or 10% attack time! 
@@ -43,6 +46,13 @@ void pointPlayer::setup( pointRecorder * pr ){
 
 void pointPlayer::update(){
 	if( suicide ) return; 
+	
+	//cout << ofGetElapsedTimef() - startTime << "///" << startDelay << endl; 
+	if( ofGetElapsedTimef() - startTime < startDelay ){
+		// okay, don't start yet! 
+		timeOfLastFrame = ofGetElapsedTimef(); 
+		return; 
+	}
 	
 	diffTime		= ofGetElapsedTimef() - timeOfLastFrame;
 	timeOfLastFrame		= ofGetElapsedTimef(); 

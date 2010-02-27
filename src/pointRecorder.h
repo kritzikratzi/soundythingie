@@ -65,7 +65,10 @@ class pointRecorder {
 	
 		bool enabled; 
 		bool triggerAlways; 
-		int index; 
+		int index;
+	
+		// what's the time-offset compared to the beat? 
+		float startDelay; 
 	
 };
 

@@ -56,6 +56,10 @@ class pointPlayer{
 		float attackTime; 
 		float releaseTime; 
 		int samplesSinceUpdate; 
+	
+		// how long should we wait before starting? 
+		float startDelay; 
+		float startTime; 
 };
 
 #endif

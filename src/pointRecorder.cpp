@@ -82,6 +82,7 @@ void pointRecorder::reset( int beatMod ) {
 	offsetY = 0; 
 	bAmRecording = true;
 	volume = 0.1f;
+	startDelay = 0; 
 	startTime = 0; 
 	enabled = true; 
 	

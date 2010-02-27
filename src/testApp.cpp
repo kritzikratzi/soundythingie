@@ -94,7 +94,6 @@ void testApp::update(){
 			vector<pointPlayer*> * them = &playersOfRecorders[ players[i].pr->index ]; 
 			for( int j = 0; j < them->size(); j++ ){
 				if( them->at(j) == &players[i] ){
-					cout << " removing player " << i << " from recorder " << players[i].pr->index << endl; 
 					them->erase( them->begin()+j ); 
 					break; 
 				}
@@ -313,7 +312,6 @@ void testApp::draw(){
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( players[i].dead ){
-			cout << "Using player " << i << " for " << pr->index << " ------- " << playersOfRecorders[pr->index].size() << endl; 
 			playersOfRecorders[pr->index].push_back( &players[i] ); 
 			players[i].setup( pr ); 
 			return; 
@@ -664,6 +662,13 @@ void testApp::mousePressed(int x, int y, int button){
 				recording->babysitting.push_back( hovering );
 				recording->triggerAlways = false; 
 				hovering->babysitter = recording; 
+			}
+			
+			// no one's spawn (parenting or normal) 
+			// and on a classic beat
+			if( spawnFocusRecorder < 0 && beatMod > 0 ){
+				recording->startDelay = ofGetElapsedTimef() - bpmLastTriggered[beatMod];
+				cout << recording->startDelay << endl; 
 			}
 			
 			return; 

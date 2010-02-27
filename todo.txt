@@ -35,6 +35,7 @@ TODO:
   use a key to quickly duplicate a line
   (with some x offset, or some random position around the original, 
    also the line could be randomized to be a bit funkier) 
+- bring all heads back into the screen
 
 
 maybe later (=not gonna happen)
