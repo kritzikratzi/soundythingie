@@ -469,6 +469,18 @@ void testApp::keyPressed  (int key){
 			setEnabled[nr] = true; 
 		}
 	}
+	
+	if( key == 'x' ){
+		ofPoint * pt; 
+		for( int i = 0; i < RECORDERS; i++ ){
+			if( recorders[i].active() ){
+				pt = &recorders[i].pts[0].pos; 
+				if( pt->x < 0 || pt->y < 0 || pt->x > ofGetHeight() || pt->y > ofGetHeight() ){
+					deleteRecorder( &recorders[i] ); 
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------
