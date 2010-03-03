@@ -822,7 +822,8 @@ void testApp::deleteRecorder( pointRecorder * rec ){
 			// this doesn't have to be the case, it might be... 
 			for( int j = 0; j < pr->kids.size(); j++ ){
 				if( pr->kids[j] == rec ){
-					pr->kids.erase( recorders[i].kids.begin()+j );
+					pr->kids.erase( pr->kids.begin()+j );
+					pr->kidPointNr.erase( pr->kidPointNr.begin()+j );
 					j--; 
 				}
 			}

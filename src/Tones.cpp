@@ -38,6 +38,7 @@ void Tones::draw(){
 
 float Tones::snap( float y ){
 	float y1, y2, y3; 
+	float result = y; 
 	for( int i = 2; i < NUM_TONES-1; i++ ){
 		y1 = (int) yValue(toneFrequencies[i-1]);
 		y2 = (int) yValue(toneFrequencies[i]);
@@ -47,9 +48,17 @@ float Tones::snap( float y ){
 		y3 = (y2+y3)/2; 
 		
 		if( y <= y1 && y >= y3 ){
-			return y2; 
+			result = y2; 
+			break; 
 		}
 	}
+	
+	if( result < 0 ) result = 0; 
+	if( result > ofGetHeight() ){
+		result = ofGetHeight(); 
+	}
+	
+	return result; 
 }
 
 /**
