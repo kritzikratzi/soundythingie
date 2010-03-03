@@ -114,6 +114,7 @@ void pointPlayer::draw(){
 void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, bool useEnvelope ){
 	// note: buffer size is 256 (0.005sec)
 	if( suicide ) return; 
+	if( timeOfLastFrame - startTime < startDelay ) return; 
 	
 	float leftScale, rightScale; 
 	
