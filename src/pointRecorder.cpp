@@ -211,3 +211,121 @@ ofPoint pointRecorder::getVelocityForTime(float time){
 bool pointRecorder::active(){
 	return startTime != 0 && enabled != 0; 
 }
+
+
+
+void pointRecorder::save( ofstream& out ){
+	out << "startTime:" << startTime << endl; 
+	out << "offsetX:" << offsetX << endl; 
+	out << "offsetY:" << offsetY << endl; 
+	out << "maxNumPts:" << maxNumPts << endl; 
+	out << "beatMod:" << beatMod << endl; 
+	out << "volume:" << volume << endl; 
+	out << "soundShape:" << soundShape << endl; 
+	out << "enabled:" << enabled << endl; 
+	out << "triggerAlways:" << triggerAlways << endl;
+	out << "startDelay:" << startDelay << endl; 
+	
+	out << "timePt:"; 
+	for( int i = 0; i < pts.size(); i++ ){
+		out << pts[i].time << " " << pts[i].pos.x << " " << pts[i].pos.y << " "; 
+	}
+	out << "-1" << endl;
+	
+	out << "kids:"; 
+	for( int i = 0; i < kids.size(); i++ ){
+		out << kids[i]->index << " "; 
+	}
+	out << "-1" << endl; 
+	
+	out << "kidPointNr:"; 
+	for( int i = 0; i < kidPointNr.size(); i++ ){
+		out << kidPointNr[i]; 
+	}
+	out << endl; 
+	
+	out << "babysitting:"; 
+	for( int i = 0; i < babysitting.size(); i++ ){
+		out << babysitting[i]->index; 
+	}
+	out << endl; 
+	
+	out << "END:" << endl;
+}
+
+void pointRecorder::load( ifstream& in ){
+	char cmd[64]; 
+	
+	// Manually set this to false! 
+	bAmRecording = false; 
+
+	while( !in.eof() ){
+		Helpers::readCommand( cmd, in ); 
+		
+		if( 0 == strcmp( cmd, "startTime" ) ) in >> startTime; 
+		if( 0 == strcmp( cmd, "offsetX" ) ) in >> offsetX; 
+		if( 0 == strcmp( cmd, "offsetY" ) ) in >> offsetY; 
+		if( 0 == strcmp( cmd, "maxNumPts" ) ) in >> maxNumPts; 
+		if( 0 == strcmp( cmd, "beatMod" ) ) in >> beatMod; 
+		if( 0 == strcmp( cmd, "volume" ) ) in >> volume; 
+		if( 0 == strcmp( cmd, "soundShape" ) ) in >> soundShape; 
+		if( 0 == strcmp( cmd, "enabled" ) ) in >> enabled; 
+		if( 0 == strcmp( cmd, "triggerAlways" ) ) in >> triggerAlways; 
+		if( 0 == strcmp( cmd, "startDelay" ) ) in >> startDelay; 
+		
+		if( 0 == strcmp( cmd, "timePt" ) ){
+			float t; 
+			in >> t; 
+			
+			while( t != -1 && !in.eof() ){
+				timePt	point;
+				point.pos = ofPoint(0,0);
+				in >> point.pos.x; 
+				in >> point.pos.y; 
+				point.time = t;
+				pts.push_back( point ); 
+				in >> t; 
+			}
+		}
+		
+		if( 0 == strcmp( cmd, "END" ) ) break; 
+	}
+	
+/*	out << "startTime:" << startTime << endl; 
+	out << "offsetX:" << offsetX << endl; 
+	out << "offsetY:" << offsetY << endl; 
+	out << "maxNumPts:" << maxNumPts << endl; 
+	out << "beatMod:" << beatMod << endl; 
+	out << "volume:" << volume << endl; 
+	
+	out << "timePt:"; 
+	for( int i = 0; i < pts.size(); i++ ){
+		out << pts[i].time << " " << pts[i].pos.x << " " << pts[i].pos.y << " "; 
+	}
+	out << "-1" << endl;
+	
+	out << "kids:"; 
+	for( int i = 0; i < kids.size(); i++ ){
+		out << kids[i]->index << " "; 
+	}
+	out << "-1" << endl; 
+	
+	out << "kidPointNr:"; 
+	for( int i = 0; i < kidPointNr.size(); i++ ){
+		out << kidPointNr[i]; 
+	}
+	out << endl; 
+	
+	out << "babysitting:"; 
+	for( int i = 0; i < babysitting.size(); i++ ){
+		out << babysitting[i]->index; 
+	}
+	out << endl; 
+	
+	out << "soundShape:" << soundShape << endl; 
+	out << "enabled:" << enabled << endl; 
+	out << "triggerAlways:" << triggerAlways << endl;
+	out << "startDelay:" << startDelay << endl; 
+	out << "END:";*/
+}
+

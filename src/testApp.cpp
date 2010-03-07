@@ -1,5 +1,4 @@
 #include "testApp.h"
-#include "ofMain.h"
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -481,6 +480,16 @@ void testApp::keyPressed  (int key){
 			}
 		}
 	}
+	
+	
+	if( key == '.' ){
+		// IO::save( this, "test.txt" ); 
+		save(); 
+	}
+	if( key == ',' ){
+		// IO::save( this, "test.txt" ); 
+		load(); 
+	}
 }
 
 //--------------------------------------------------------------
@@ -910,4 +919,147 @@ bool testApp::inPoly(ofPoint *polygon,int N, ofPoint p ){
 		return false;
 	else
 		return true;
+}
+
+
+// ------------------------
+void testApp::save(){
+	short fRefNumOut;
+	FSRef output_file;
+	OSStatus err;
+
+	NavDialogCreationOptions options;
+	NavGetDefaultDialogCreationOptions( &options );
+	options.modality = kWindowModalityAppModal;
+	//CFPropertyListRef propRef = CFPreferencesCopyAppValue( CFSTR("currentDirectory"), CFSTR("org.sd.soundythingie") ); 
+	//options.saveFileName = (CFStringRef) propRef; 
+	//cout << "STR: " << CFStringGetCStringPtr(options.saveFileName, kCFStringEncodingUnicode) << endl; 
+	
+	NavDialogRef dialog;
+	err = NavCreatePutFileDialog(&options, '?', '?', NULL, NULL, &dialog);
+	err = NavDialogRun(dialog);
+
+	NavUserAction action;
+	action = NavDialogGetUserAction( dialog );
+	if (action == kNavUserActionNone || action == kNavUserActionCancel) {
+		cout << "user canceled" << endl; 
+		return; 
+		// return 2;
+	}
+
+	// get dialog reply
+	NavReplyRecord reply;
+	err = NavDialogGetReply(dialog, &reply);
+	if ( err != noErr )
+		return; // return 2;
+
+	if ( reply.replacing )
+	{
+		printf("need to replace\n");
+	}
+
+	AEKeyword keyword;
+	DescType actual_type;
+	Size actual_size;
+	FSRef output_dir;
+	err = AEGetNthPtr(&(reply.selection), 1, typeFSRef, &keyword, &actual_type,
+					  &output_dir, sizeof(output_file), &actual_size);
+
+	//printf("AEGetNthPtr returned %i\n", err );
+
+
+	CFURLRef cfUrl = CFURLCreateFromFSRef( kCFAllocatorDefault, &output_dir );
+	CFStringRef cfString = NULL;
+	if ( cfUrl != NULL )
+	{
+		cfString = CFURLCopyFileSystemPath( cfUrl, kCFURLPOSIXPathStyle );
+		CFRelease( cfUrl );
+	}
+
+	// copy from a CFString into a local c string (http://www.carbondev.com/site/?page=CStrings+)
+	const int kBufferSize = 255;
+
+	char folderURL[kBufferSize];
+	Boolean bool1 = CFStringGetCString(cfString,folderURL,kBufferSize,kCFStringEncodingMacRoman);
+
+	char fileName[kBufferSize];
+	Boolean bool2 = CFStringGetCString(reply.saveFileName,fileName,kBufferSize,kCFStringEncodingMacRoman);
+
+	// append strings together
+
+	string url1 = folderURL;
+	string url2 = fileName;
+	string finalURL = url1 + "/" + url2;
+
+	printf("url %s\n", finalURL.c_str());
+
+	// cleanup dialog
+	NavDialogDispose(dialog);
+	//CFStringRef ref = CFStringCreateWithCString(NULL, finalURL.c_str(), kCFStringEncodingUnicode );
+	//cout << ref << endl; 
+	//CFPreferencesSetAppValue(CFSTR("currentDirectory"), ref, CFSTR("org.sd.soundythingie") ); 
+	//CFPreferencesAppSynchronize( CFSTR("org.sd.soundythingie") ); 
+	
+	IO::save( this, finalURL ); 
+}
+
+
+// ------------------------
+void testApp::load(){
+	short fRefNumOut;
+	FSRef output_file;
+	OSStatus err;
+	NavReplyRecord replyRecord;
+	
+	NavDialogCreationOptions options;
+	NavGetDefaultDialogCreationOptions( &options );
+	options.modality = kWindowModalityAppModal;
+	//CFPropertyListRef propRef = CFPreferencesCopyAppValue( CFSTR("currentDirectory"), CFSTR("org.sd.soundythingie") ); 
+	//options.saveFileName = (CFStringRef) propRef; 
+	//cout << "STR: " << CFStringGetCStringPtr(options.saveFileName, kCFStringEncodingUnicode) << endl; 
+	
+	NavDialogRef dialog;
+
+	err = NavCreateGetFileDialog(&options, NULL, NULL, NULL, NULL, NULL, &dialog);
+	err = NavDialogRun(dialog);
+	
+	NavUserAction action;
+	action = NavDialogGetUserAction( dialog );
+	if (action == kNavUserActionNone || action == kNavUserActionCancel) {
+		cout << "user canceled" << endl; 
+		return; 
+		// return 2;
+	}
+	
+
+	
+	// Get the reply
+	err = NavDialogGetReply(dialog, &replyRecord);
+	// If the user clicked "Cancel", just bail
+	if ( err == userCanceledErr ){
+		return; 
+	}
+	
+	// Get the file
+	err = AEGetNthPtr(&(replyRecord.selection), 1, typeFSRef, NULL, NULL, &output_file, sizeof(FSRef), NULL);
+	
+	// Convert it to a CFURL
+	CFURLRef cfUrl = CFURLCreateFromFSRef(NULL, &output_file);
+	
+	
+	CFStringRef cfString = NULL;
+	if ( cfUrl != NULL )
+	{
+		cfString = CFURLCopyFileSystemPath( cfUrl, kCFURLPOSIXPathStyle );
+		CFRelease( cfUrl );
+	}
+	
+	// copy from a CFString into a local c string (http://www.carbondev.com/site/?page=CStrings+)
+	const int kBufferSize = 512;
+	
+	char folderURL[kBufferSize];
+	Boolean bool1 = CFStringGetCString(cfString,folderURL,kBufferSize,kCFStringEncodingMacRoman);
+	
+	
+	IO::load( this, string( folderURL ) ); 
 }

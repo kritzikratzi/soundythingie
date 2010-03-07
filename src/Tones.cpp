@@ -8,7 +8,6 @@
  */
 
 #include "Tones.h"
-#include "ofMain.h"
 
 float Tones::pHeight = 0; 
 float Tones::yValues[135]; 

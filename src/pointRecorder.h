@@ -2,19 +2,9 @@
 #define POINT_RECORDER_H
 
 #include "ofMain.h"
-
-
-// ---------------------------
-// this is like an old school class, a "struct"
-// it doesn't have functions, just data...
-// it's C style -
-//
-// typedef 
-// http://bytes.com/forum/thread620088.html
-// http://en.wikipedia.org/wiki/Typedef
-// struct
-// http://www.itee.uq.edu.au/~comp2303/Leslie_C_ref/C/SYNTAX/struct.html
-// http://en.wikipedia.org/wiki/C%2B%2B_structures_and_classes
+#include "pointPlayer.h"
+#include "Helpers.h"
+#include <fstream>
 
 
 typedef struct {
@@ -40,6 +30,8 @@ class pointRecorder {
 		ofPoint getPointForTime(float time);
 		ofPoint getVelocityForTime(float time);
 		
+		void save( ofstream& out ); 
+		void load( ifstream& in ); 
 		
 		float				startTime;
 		int					maxNumPts;

@@ -2,15 +2,17 @@
 #define __PEEPEE
 
 
-#include "ofMain.h"
-#include "pointRecorder.h" 
-#include "Tones.h" 
+#include "pointRecorder.h"
+#include "Tones.h"
+#include "Helpers.h"
 
 // shape functions
 float shapeFlat( float t ); 
 float shapeSinus( float t ); 
 float shapeSawtooth( float t ); 
 float shapeRectangle( float t ); 
+
+class pointRecorder; 
 
 class pointPlayer{
 	public: 

@@ -1,20 +1,30 @@
 #ifndef _TEST_APP
 #define _TEST_APP
 
-#include "ofMain.h"
-//#include "ofAddons.h"
-#include <algorithm>
-
-#include "pointRecorder.h"
-#include "pointPlayer.h" 
-#include "Tones.h"
-
 #define RECORDERS 200
 #define PLAYERS 200
 #define SHAPE_FLAT 0
 #define SHAPE_SINUS 1
 #define SHAPE_SAWTOOTH 2
 #define SHAPE_RECTANGLE 3
+
+
+#include "ofMain.h"
+
+//#include "ofAddons.h"
+#include <algorithm>
+#include <fstream>
+
+#include "pointRecorder.h"
+#include "pointPlayer.h" 
+#include "Tones.h"
+#include "IO.h"
+
+
+
+class pointRecorder; 
+class pointPlayer; 
+class IO; 
 
 class testApp : public ofSimpleApp{
 
@@ -39,6 +49,8 @@ class testApp : public ofSimpleApp{
 	
 		bool inRect( float pX, float pY, float x, float y, float width, float height ); 
 		bool inPoly( ofPoint *polygon, int N, ofPoint p ); 
+		void save();
+		void load();
 	
 		float triggerAlpha[6]; 
 	
@@ -64,8 +76,8 @@ class testApp : public ofSimpleApp{
 		float 	phaseAdder;
 		float 	phaseAdderTarget;
 	
-		pointRecorder recorders[RECORDERS];
-		pointPlayer players[PLAYERS];
+		pointRecorder recorders[200];
+		pointPlayer players[200];
 		vector<pointPlayer *> playersOfRecorders[RECORDERS]; 
 		
 		int beatMod; 
