@@ -1,5 +1,5 @@
-Untitled-2.nb
 build
 bin
-openFrameworks.xcodeproj/hansi.mode1v3
-openFrameworks.xcodeproj/hansi.pbxuser
+!bin/data
+osx10.4.xcodeproj/*
+!osx10.4.xcodeproj/project.pbxproj
