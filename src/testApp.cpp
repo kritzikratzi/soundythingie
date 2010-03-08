@@ -1003,6 +1003,24 @@ void testApp::save(){
 
 	save( finalURL );
 	#endif
+
+	#ifdef __WIN32__
+	char szFileName[MAX_PATH] = "";
+
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = "All Files (*.*)\0*.*\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = 0;
+
+	if(GetSaveFileName(&ofn)) {
+	   save(string(szFileName));
+	}
+	#endif
 }
 
 
@@ -1064,8 +1082,27 @@ void testApp::load(){
 	Boolean bool1 = CFStringGetCString(cfString,folderURL,kBufferSize,kCFStringEncodingMacRoman);
 
 
-	load( string( folderURL ) );
+	save( string( folderURL ) );
 
+	#endif
+
+
+	#ifdef __WIN32__
+	char szFileName[MAX_PATH] = "";
+
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = "All Files (*.*)\0*.*\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = 0;
+
+	if(GetOpenFileName(&ofn)) {
+	   load(string(szFileName));
+	}
 	#endif
 }
 

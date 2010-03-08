@@ -5,7 +5,7 @@
 		<Option title="SoundyThingie" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="addons\;src\;" />
+		<Option virtualFolders="addons\;" />
 		<Build>
 			<Target title="release">
 				<Option output="bin\$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
@@ -21,6 +21,10 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="../../../libs/openFrameworksCompiled/lib/win_cb/openFrameworks.lib" />
+					<Add library="gdi32" />
+					<Add library="user32" />
+					<Add library="kernel32" />
+					<Add library="Comdlg32" />
 				</Linker>
 			</Target>
 			<Target title="debug">
@@ -36,6 +40,10 @@
 				</Compiler>
 				<Linker>
 					<Add option="../../../libs/openFrameworksCompiled/lib/win_cb/openFrameworksDebug.lib" />
+					<Add library="gdi32" />
+					<Add library="user32" />
+					<Add library="kernel32" />
+					<Add library="Comdlg32" />
 				</Linker>
 			</Target>
 		</Build>
@@ -90,6 +98,9 @@
 			<Add option="-lwsock32" />
 			<Add option="-lws2_32" />
 			<Add option="-lIphlpapi" />
+			<Add library="gdi32" />
+			<Add library="user32" />
+			<Add library="kernel32" />
 		</Linker>
 		<ExtraCommands>
 			<Add after='xcopy /e /i /y &quot;$(PROJECT_DIR)..\..\..\export\win_cb\*.dll&quot;  &quot;$(PROJECT_DIR)bin&quot;' />
@@ -100,19 +111,13 @@
 		<Unit filename="src\Helpers.h" />
 		<Unit filename="src\Tones.cpp" />
 		<Unit filename="src\Tones.h" />
-		<Unit filename="src\main.cpp">
-			<Option virtualFolder="src\" />
-		</Unit>
+		<Unit filename="src\main.cpp" />
 		<Unit filename="src\pointPlayer.cpp" />
 		<Unit filename="src\pointPlayer.h" />
 		<Unit filename="src\pointRecorder.cpp" />
 		<Unit filename="src\pointRecorder.h" />
-		<Unit filename="src\testApp.cpp">
-			<Option virtualFolder="src\" />
-		</Unit>
-		<Unit filename="src\testApp.h">
-			<Option virtualFolder="src\" />
-		</Unit>
+		<Unit filename="src\testApp.cpp" />
+		<Unit filename="src\testApp.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

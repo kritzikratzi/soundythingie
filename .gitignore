@@ -3,3 +3,6 @@ bin
 !bin/data
 osx10.4.xcodeproj/*
 !osx10.4.xcodeproj/project.pbxproj
+win32.depend
+win32.layout
+obj
