@@ -12,6 +12,7 @@ typedef struct {
 	float		time; // from the start, what time does this pt occur at	
 } timePt;
 
+class pointPlayer;
 
 
 class pointRecorder {
@@ -31,7 +32,7 @@ class pointRecorder {
 		ofPoint getVelocityForTime(float time);
 		
 		void save( ofstream& out ); 
-		void load( ifstream& in ); 
+		void load( ifstream& in, pointRecorder recorders[], pointPlayer players[] );
 		
 		float				startTime;
 		int					maxNumPts;

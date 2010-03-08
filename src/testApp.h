@@ -18,13 +18,11 @@
 #include "pointRecorder.h"
 #include "pointPlayer.h" 
 #include "Tones.h"
-#include "IO.h"
 
 
 
 class pointRecorder; 
 class pointPlayer; 
-class IO; 
 
 class testApp : public ofSimpleApp{
 
@@ -51,6 +49,8 @@ class testApp : public ofSimpleApp{
 		bool inPoly( ofPoint *polygon, int N, ofPoint p ); 
 		void save();
 		void load();
+		bool save( string filename ); 
+		bool load( string filename ); 
 	
 		float triggerAlpha[6]; 
 	

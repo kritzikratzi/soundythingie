@@ -1000,7 +1000,7 @@ void testApp::save(){
 	//CFPreferencesSetAppValue(CFSTR("currentDirectory"), ref, CFSTR("org.sd.soundythingie") ); 
 	//CFPreferencesAppSynchronize( CFSTR("org.sd.soundythingie") ); 
 	
-	IO::save( this, finalURL ); 
+	save( finalURL ); 
 }
 
 
@@ -1061,5 +1061,74 @@ void testApp::load(){
 	Boolean bool1 = CFStringGetCString(cfString,folderURL,kBufferSize,kCFStringEncodingMacRoman);
 	
 	
-	IO::load( this, string( folderURL ) ); 
+	load( string( folderURL ) ); 
+}
+
+
+// ------------------------
+bool testApp::save( string filename ){
+	
+	ofstream out( filename.c_str(), ios::out );
+	for( int i = 0; i < RECORDERS; i++ ){
+		out << "recorder:" << i << endl; 
+		recorders[i].save( out ); 
+	}
+	
+	for( int i = 0; i < 12; i++ ){
+		out << "set:"; 
+		for( int j = 0; j < sets[i].size(); j++ ){
+			out << sets[i][j]->index << " "; 
+		}
+		out << "-1" << endl; 
+		out << "setEnabled:" << setEnabled[i] << endl; 
+	}
+	
+	out.close();
+	
+	return false; 
+}
+
+
+// ------------------------
+bool testApp::load( string filename ){
+	ifstream in( filename.c_str(), ios::in ); 
+	
+	// Reset EVERYTHING! 
+	for( int i = 0; i < RECORDERS; i++ ){
+		recorders[i].reset( 0 ); 
+	}
+	for( int i = 0; i < 12; i++ ){
+		sets[i].clear(); 
+	}
+	
+	char cmd[64]; 
+	
+	int iRec = 0; 
+	int iSet = 0; 
+	int iSetEnabled = 0; 
+	while( !in.eof() ){
+		Helpers::readCommand( cmd, in ); 
+		if( 0 == strcmp( cmd, "recorder" ) ){
+			recorders[iRec++].load( in, recorders, players ); 
+		}
+		if( 0 == strcmp( cmd, "set" ) ){
+			int i = 0; in >> i; 
+			while( i != -1 && !in.eof() ){
+				sets[iSet].push_back( &recorders[i] ); 
+				in >> i; 
+			}
+			iSet ++; 
+		}
+		if( 0 == strcmp( cmd, "setEnabled" ) ){
+			in >> setEnabled[iSetEnabled++]; 
+		}
+	}
+
+	// great, now apply current set status! 
+	for( int i = 0; i < 12; i++ ){
+		for (vector<pointRecorder *>::iterator pr = sets[i].begin(); pr != sets[i].end(); ++pr ){
+			(*pr)->enabled = setEnabled[i]; 
+		}
+	}
+	in.close(); 
 }

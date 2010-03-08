@@ -215,6 +215,12 @@ bool pointRecorder::active(){
 
 
 void pointRecorder::save( ofstream& out ){
+	
+	if( startTime == 0 ){
+		out << "END:" << endl; 
+		return; 
+	}
+	
 	out << "startTime:" << startTime << endl; 
 	out << "offsetX:" << offsetX << endl; 
 	out << "offsetY:" << offsetY << endl; 
@@ -225,6 +231,7 @@ void pointRecorder::save( ofstream& out ){
 	out << "enabled:" << enabled << endl; 
 	out << "triggerAlways:" << triggerAlways << endl;
 	out << "startDelay:" << startDelay << endl; 
+	out << "babysitter:" << (babysitter==NULL?-1:(babysitter->index)) << endl; 
 	
 	out << "timePt:"; 
 	for( int i = 0; i < pts.size(); i++ ){
@@ -240,20 +247,20 @@ void pointRecorder::save( ofstream& out ){
 	
 	out << "kidPointNr:"; 
 	for( int i = 0; i < kidPointNr.size(); i++ ){
-		out << kidPointNr[i]; 
+		out << kidPointNr[i] << " "; 
 	}
-	out << endl; 
+	out << "-1" << endl; 
 	
 	out << "babysitting:"; 
 	for( int i = 0; i < babysitting.size(); i++ ){
-		out << babysitting[i]->index; 
+		out << babysitting[i]->index << " "; 
 	}
-	out << endl; 
+	out << "-1" << endl; 
 	
 	out << "END:" << endl;
 }
 
-void pointRecorder::load( ifstream& in ){
+void pointRecorder::load( ifstream& in, pointRecorder recorders[], pointPlayer players[] ){
 	char cmd[64]; 
 	
 	// Manually set this to false! 
@@ -272,6 +279,15 @@ void pointRecorder::load( ifstream& in ){
 		if( 0 == strcmp( cmd, "enabled" ) ) in >> enabled; 
 		if( 0 == strcmp( cmd, "triggerAlways" ) ) in >> triggerAlways; 
 		if( 0 == strcmp( cmd, "startDelay" ) ) in >> startDelay; 
+		if( 0 == strcmp( cmd, "babysitter" ) ){
+			int i; in >> i; 
+			if( i == -1 ){
+				babysitter = NULL; 
+			}
+			else{
+				babysitter = &recorders[i]; 
+			}
+		}
 		
 		if( 0 == strcmp( cmd, "timePt" ) ){
 			float t; 
@@ -287,6 +303,32 @@ void pointRecorder::load( ifstream& in ){
 				in >> t; 
 			}
 		}
+		
+		if( 0 == strcmp( cmd, "kids" ) ){
+			int i; 
+			in >> i; 
+			while( i != -1 && !in.eof() ){
+				kids.push_back( &recorders[i] ); 
+				in >> i; 
+			}
+		}
+		
+		if( 0 == strcmp( cmd, "kidPointNr" ) ){
+			int i; in >> i; 
+			while( i != -1 && !in.eof() ){
+				kidPointNr.push_back( i ); 
+				in >> i; 
+			}
+		}
+		
+		if( 0 == strcmp( cmd, "babysitting" ) ){
+			int i; in >> i; 
+			while( i != -1 && !in.eof() ){
+				babysitting.push_back( &recorders[i] ); 
+				in >> i; 
+			}
+		}
+		
 		
 		if( 0 == strcmp( cmd, "END" ) ) break; 
 	}

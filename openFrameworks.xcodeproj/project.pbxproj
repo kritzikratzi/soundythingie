@@ -10,7 +10,6 @@
 		1DDD8BBF105A6467003C0985 /* pointRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1DDD8BBE105A6467003C0985 /* pointRecorder.cpp */; };
 		BA4CB4E310F3AD2B00C668AD /* Tones.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA4CB4E210F3AD2B00C668AD /* Tones.cpp */; };
 		BA713F9E10D4195A00CADA12 /* pointPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */; };
-		BA7FB0E0114407DF00D4B7A7 /* IO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA7FB0DF114407DF00D4B7A7 /* IO.cpp */; };
 		BA7FB21A1144581F00D4B7A7 /* Helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA7FB2191144581F00D4B7A7 /* Helpers.cpp */; };
 		BA81ECA010D6A2040073B73B /* todo.txt in Resources */ = {isa = PBXBuildFile; fileRef = BA81EC9F10D6A2040073B73B /* todo.txt */; };
 		BA8DF4CA10D737B300AA63B7 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BA8DF4C910D737B300AA63B7 /* icon.icns */; };
@@ -64,8 +63,6 @@
 		BA4CB4E210F3AD2B00C668AD /* Tones.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tones.cpp; sourceTree = "<group>"; };
 		BA713F9C10D4195A00CADA12 /* pointPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pointPlayer.h; sourceTree = "<group>"; };
 		BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pointPlayer.cpp; sourceTree = "<group>"; };
-		BA7FB0DE114407DF00D4B7A7 /* IO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IO.h; sourceTree = "<group>"; };
-		BA7FB0DF114407DF00D4B7A7 /* IO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IO.cpp; sourceTree = "<group>"; };
 		BA7FB2181144581F00D4B7A7 /* Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helpers.h; sourceTree = "<group>"; };
 		BA7FB2191144581F00D4B7A7 /* Helpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Helpers.cpp; sourceTree = "<group>"; };
 		BA81EC9F10D6A2040073B73B /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.txt; sourceTree = "<group>"; };
@@ -770,8 +767,6 @@
 				BA713F9D10D4195A00CADA12 /* pointPlayer.cpp */,
 				BA4CB4E110F3AD2B00C668AD /* Tones.h */,
 				BA4CB4E210F3AD2B00C668AD /* Tones.cpp */,
-				BA7FB0DE114407DF00D4B7A7 /* IO.h */,
-				BA7FB0DF114407DF00D4B7A7 /* IO.cpp */,
 				BA7FB2181144581F00D4B7A7 /* Helpers.h */,
 				BA7FB2191144581F00D4B7A7 /* Helpers.cpp */,
 			);
@@ -874,7 +869,6 @@
 				1DDD8BBF105A6467003C0985 /* pointRecorder.cpp in Sources */,
 				BA713F9E10D4195A00CADA12 /* pointPlayer.cpp in Sources */,
 				BA4CB4E310F3AD2B00C668AD /* Tones.cpp in Sources */,
-				BA7FB0E0114407DF00D4B7A7 /* IO.cpp in Sources */,
 				BA7FB21A1144581F00D4B7A7 /* Helpers.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
