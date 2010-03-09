@@ -18,6 +18,7 @@
 #include "pointRecorder.h"
 #include "pointPlayer.h"
 #include "Tones.h"
+#include "ImageButton.h"
 
 #ifdef __WIN32__
 #include <windows.h>
@@ -26,6 +27,7 @@
 
 class pointRecorder;
 class pointPlayer;
+class ImageButton; 
 
 class testApp : public ofSimpleApp{
 
@@ -47,13 +49,22 @@ class testApp : public ofSimpleApp{
 		void deleteRecordersKids( pointRecorder * rec );
 		void moveRecorder( pointRecorder * rec, int dx, int dy, bool moveKids );
 		void drawImage( ofImage * img, float x, float y, bool selected = false, float overlay = 0 );
-
-		bool inRect( float pX, float pY, float x, float y, float width, float height );
-		bool inPoly( ofPoint *polygon, int N, ofPoint p );
-		void save();
-		void load();
 		bool save( string filename );
 		bool load( string filename );
+	
+		// yey- and here come some annoying helper functions! 
+		// when you don't know what you're doing always use these
+		// instead of setting the variables directly! 
+		void clear(); 
+		void save();
+		void load();
+		void setBeatMod( int mod ); 
+		void setSoundShape( int shape ); 
+		void startSelection( bool append ); 
+		void endSelection(); 
+		void setChromaticMode( bool enabled ); 
+		void setSignalVisualizer( bool enabled ); 
+		void setTriggerAlwaysMode( bool always ); 
 
 		float triggerAlpha[6];
 
@@ -94,11 +105,25 @@ class testApp : public ofSimpleApp{
 
 		ofImage beatImgs[6];
 		ofImage shapeImgs[4];
-		ofImage envelopeImg;
 		ofImage selectionImg;
 		ofImage triggerAlwaysImg;
 		ofImage triggerOnceImg;
-
+	
+		// and the according buttons! 
+		ImageButton beatBtns[6];
+		ImageButton shapeBtns[4];
+		ImageButton selectionBtn;
+		ImageButton triggerBtn;
+		ImageButton chromaticBtn;
+		ImageButton loadBtn;
+		ImageButton newBtn;
+		ImageButton saveBtn;
+		ImageButton selectBtn;
+		ImageButton signalBtn;
+	
+		vector<ImageButton *> buttons; 
+		
+		
 		// some modes...
 		bool  	bFullscreen;
 		bool useEnvelope;

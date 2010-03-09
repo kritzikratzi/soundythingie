@@ -53,21 +53,56 @@ void testApp::setup(){
 
 
 	// load images...
-	beatImgs[0].loadImage( "beat_0.png" );
-	beatImgs[1].loadImage( "beat_1.png" );
-	beatImgs[2].loadImage( "beat_2.png" );
-	beatImgs[3].loadImage( "beat_3.png" );
-	beatImgs[4].loadImage( "beat_4.png" );
-	beatImgs[5].loadImage( "beat_5.png" );
-	shapeImgs[0].loadImage( "shape_flat.png" );
-	shapeImgs[1].loadImage( "shape_sinus.png" );
-	shapeImgs[2].loadImage( "shape_sawtooth.png" );
-	shapeImgs[3].loadImage( "shape_rectangle.png" );
-	envelopeImg.loadImage( "envelope.png" );
-	selectionImg.loadImage( "selection.png" );
 	triggerAlwaysImg.loadImage( "trigger_always.png" );
 	triggerOnceImg.loadImage( "trigger_once.png" );
 
+	// And buttons! 
+	int X = 15; 
+	int Y = 15; 
+	int D1 = 10; 
+	int D2 = 30; 
+	
+	beatBtns[0].init( X, Y, "beat_0.png" ); X += beatBtns[0].w + D1;
+	beatBtns[1].init( X, Y, "beat_1.png" ); X += beatBtns[1].w + D1;
+	beatBtns[2].init( X, Y, "beat_2.png" ); X += beatBtns[2].w + D1;
+	beatBtns[3].init( X, Y, "beat_3.png" ); X += beatBtns[3].w + D1;
+	beatBtns[4].init( X, Y, "beat_4.png" ); X += beatBtns[4].w + D1;
+	beatBtns[5].init( X, Y, "beat_5.png" ); X += beatBtns[5].w + D1 + D2;
+	
+	shapeBtns[0].init( X, Y, "shape_flat.png" );      X += shapeBtns[0].w + D1;
+	shapeBtns[1].init( X, Y, "shape_sinus.png" );     X += shapeBtns[1].w + D1;
+	shapeBtns[2].init( X, Y, "shape_rectangle.png" ); X += shapeBtns[2].w + D1;
+	shapeBtns[3].init( X, Y, "shape_sawtooth.png" );  X += shapeBtns[3].w + D1 + D2;
+	
+	newBtn.init ( X, Y, "new.png" );  X += newBtn.w + D1;
+	loadBtn.init( X, Y, "load.png" ); X += loadBtn.w + D1;
+	saveBtn.init( X, Y, "save.png" ); X += saveBtn.w + D1 + D2;
+	
+	selectBtn.init   ( X, Y, "select.png" );    X += selectBtn.w + D1;
+	chromaticBtn.init( X, Y, "chromatic.png" ); X += chromaticBtn.w + D1;
+	signalBtn.init   ( X, Y, "signal.png" );    X += signalBtn.w + D1;
+	triggerBtn.init  ( X, Y, "trigger.png" );   X += triggerBtn.w + D1 + D2;
+	
+	
+	// now add all buttons to our buttons vector! 
+	buttons.push_back( &beatBtns[0] ); 
+	buttons.push_back( &beatBtns[1] ); 
+	buttons.push_back( &beatBtns[2] ); 
+	buttons.push_back( &beatBtns[3] ); 
+	buttons.push_back( &beatBtns[4] ); 
+	buttons.push_back( &beatBtns[5] ); 
+	buttons.push_back( &shapeBtns[0] ); 
+	buttons.push_back( &shapeBtns[1] ); 
+	buttons.push_back( &shapeBtns[2] ); 
+	buttons.push_back( &shapeBtns[3] ); 
+	buttons.push_back( &newBtn ); 
+	buttons.push_back( &loadBtn ); 
+	buttons.push_back( &saveBtn ); 
+	buttons.push_back( &selectBtn ); 
+	buttons.push_back( &chromaticBtn ); 
+	buttons.push_back( &signalBtn ); 
+	buttons.push_back( &triggerBtn ); 
+	
 	bpmRates[0] =   0; bpmLastTriggered[0] = 0; bpmTriggerNow[0] = false;
 	bpmRates[5] =  20; bpmLastTriggered[1] = 0; bpmTriggerNow[1] = false;
 	bpmRates[4] =  30; bpmLastTriggered[2] = 0; bpmTriggerNow[2] = false;
@@ -105,6 +140,7 @@ void testApp::update(){
 	for( int i = 1; i < 6; i++ ){
 		if( bpmLastTriggered[i] + 60.0/bpmRates[i] <= ofGetElapsedTimef() ){
 			// This is not perfect, but should work for now...
+			beatBtns[i].flash(); 
 			bpmLastTriggered[i] += 60.0/bpmRates[i];
 			bpmTriggerNow[i] = true;
 			triggerAlpha[i] = 1;
@@ -159,6 +195,12 @@ void testApp::update(){
 			}
 		}
 	}
+	
+	
+	// Update buttons too! 
+	for( int i = 0; i < buttons.size(); i++ ){
+		buttons[i]->update( mouseX, mouseY ); 
+	}
 }
 
 //--------------------------------------------------------------
@@ -205,35 +247,29 @@ void testApp::draw(){
 	ofNoFill();
 	ofSetLineWidth( 1 );
 
-	// Draw beat-images
+	/*// Draw beat-images
 	for( int i = 0; i < 6; i++ ){
 		// draw images...
 		int alpha = 120*triggerAlpha[i];
 		bool selected =
-			this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
+			Helpers::inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
 			i == beatMod; // selected
 
 		drawImage( &beatImgs[i], 10, 10+i*30, selected, alpha );
-
-		// a little guide to show "where" in the beat we are
-		/*if( i != 0 ){
-			ofSetColor( 150, 150, 150 );
-			int beat = 16<<i;
-			float t = (ofGetFrameNum()%beat)/(float) beat;
-			ofRect( 10.5 + t*18, 11.5 + i*30, 1, 0 );
-		}*/
-
 	}
 
 	// Draw images for wave forms...
 	for( int i = 0; i < 4; i++ ){
-		bool selected = this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 220.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
+		bool selected = Helpers::inRect( mouseX*1.0, mouseY*1.0, 10.0, 220.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
 		soundShape == i; // selected
 		drawImage( &shapeImgs[i], 10, 220+i*30, selected );
 	}
 
-	bool triggerHovering = this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 350.0, 20.0, 20.0 );
-	drawImage( triggerAlwaysMode?&triggerAlwaysImg:&triggerOnceImg, 10.0, 350.0, triggerHovering );
+	bool triggerHovering = Helpers::inRect( mouseX*1.0, mouseY*1.0, 10.0, 350.0, 20.0, 20.0 );
+	drawImage( triggerAlwaysMode?&triggerAlwaysImg:&triggerOnceImg, 10.0, 350.0, triggerHovering );*/
+	for( int i = 0; i < buttons.size(); i++ ){
+		buttons[i]->draw(); 
+	}
 
 	// Draw point players
 	for( int i = 0; i < PLAYERS; i++ ){
@@ -292,7 +328,7 @@ void testApp::draw(){
 		int graphW = 107;
 		int graphH = 107;
 		ofSetLineWidth( 1 );
-		ofTranslate( 50, 10 );
+		ofTranslate( 15, 50 );
 		ofScale( graphW/256.0f, graphH/200.0f );
 		ofSetRectMode( OF_RECTMODE_CORNER );
 		ofSetColor( 0x333333 );
@@ -305,7 +341,6 @@ void testApp::draw(){
 			ofLine( 300 + i, 100, 300 + i ,100 + rAudio[i] * 100.0f );
 		}
 	}
-
 }
 
 void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
@@ -324,10 +359,10 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
 	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
-
+	cout << key << endl; 
 	// set beat-mod using the keyboard
 	if( key >= '0' && key <= '5' ){
-		beatMod = key - '0';
+		setBeatMod( key - '0' ); 
 	}
 
 	if( key == ' ' ){
@@ -346,11 +381,7 @@ void testApp::keyPressed  (int key){
 	}
 
 	if( key == 'c' ){
-		for( int i = 0; i < RECORDERS; i++ ){
-			//recorders[i].clear();
-			recorders[i].startTime = 0;
-			//players[i].suicide = true;
-		}
+		clear(); 
 	}
 
 
@@ -394,32 +425,33 @@ void testApp::keyPressed  (int key){
 		cout << "CLEARED SEL REC: " << selection.size() << endl;
 	}
 
+	if( key == 'q' ) setSoundShape( 0 ); 
+	if( key == 'w' ) setSoundShape( 1 ); 
+	if( key == 'e' ) setSoundShape( 2 ); 
+	if( key == 'r' ) setSoundShape( 3 ); 
+	
 	if( key == 'f' ){
 		bFullscreen = !bFullscreen;
 		ofSetFullscreen(bFullscreen);
 	}
 
 
-	if( key == 'e' ){
-		useEnvelope = !useEnvelope;
-		cout << "Envelope: " << useEnvelope << endl;
-	}
-
 	if( key == 'a' ){
-		showAudio = !showAudio;
+		setSignalVisualizer( !showAudio ); 
 	}
 
 	if( key == 's' ){ // fresh selection
-		selectionMode = !selectionMode;
-		selectionPolyLength = 0;
-		if( selectionMode ){
-			selection.clear();
-		}
+		if( selectionMode )
+			endSelection();
+		else
+			startSelection( false ); // start selection, don't append
 	}
 
 	if( key == 'S' ){ // add to selection
-		selectionMode = !selectionMode;
-		selectionPolyLength = 0;
+		if( selectionMode )
+			endSelection();
+		else
+			startSelection( true ); // start selection, append! 
 	}
 
 	if( key == 'i' ){ // invert selection
@@ -435,7 +467,7 @@ void testApp::keyPressed  (int key){
 	}
 
 	if( key == 't' ){
-		chromaticMode = true;
+		setChromaticMode( !chromaticMode ); 
 	}
 
 
@@ -500,10 +532,6 @@ void testApp::keyReleased  (int key){
 	if( key == 'h' ){
 		holdSpawnMode = false;
 	}
-
-	if( key == 't' ){
-		chromaticMode = false;
-	}
 }
 
 //--------------------------------------------------------------
@@ -560,6 +588,17 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
+	if( selectionMode ){
+		if( selectionPolyLength < 1000 ){
+			selectionPoly[selectionPolyLength].x = x;
+			selectionPoly[selectionPolyLength].y = y;
+			selectionPolyLength++;
+		}
+		
+		return;
+	}
+	
+	
 	if( chromaticMode ){
 		y = Tones::snap( y );
 	}
@@ -584,15 +623,6 @@ void testApp::mouseDragged(int x, int y, int button){
 		}
 	}
 
-	if( selectionMode ){
-		if( selectionPolyLength < 1000 ){
-			selectionPoly[selectionPolyLength].x = x;
-			selectionPoly[selectionPolyLength].y = y;
-			selectionPolyLength++;
-		}
-
-		return;
-	}
 
 	if( recording != NULL ){
 		recording->addPoint( ofPoint(x,y,0) );
@@ -608,6 +638,39 @@ void testApp::mousePressed(int x, int y, int button){
 		y = Tones::snap( y );
 	}
 
+
+	// handle the buttons...
+	if( mouseY <= 50 ){
+		if( beatBtns[0].hover ){ setBeatMod( 0 ); return; }
+		if( beatBtns[1].hover ){ setBeatMod( 1 ); return; } 
+		if( beatBtns[2].hover ){ setBeatMod( 2 ); return; }
+		if( beatBtns[3].hover ){ setBeatMod( 3 ); return; }
+		if( beatBtns[4].hover ){ setBeatMod( 4 ); return; }
+		if( beatBtns[5].hover ){ setBeatMod( 5 ); return; }
+		
+		if( shapeBtns[0].hover ){ setSoundShape( 0 ); return; }
+		if( shapeBtns[1].hover ){ setSoundShape( 1 ); return; }
+		if( shapeBtns[2].hover ){ setSoundShape( 2 ); return; }
+		if( shapeBtns[3].hover ){ setSoundShape( 3 ); return; }
+		
+		if( newBtn.hover ){ clear(); return; }
+		if( saveBtn.hover ){ save(); return; }
+		if( loadBtn.hover ){ load(); return; }
+		if( selectBtn.hover ){ 
+			if( selectionMode )
+				endSelection();
+			else
+				startSelection( false ); 
+			
+			return; 
+		}
+		if( chromaticBtn.hover ){ setChromaticMode( !chromaticMode ); return; }
+		if( signalBtn.hover ){ setSignalVisualizer( !showAudio ); return; }
+		if( triggerBtn.hover ){ setTriggerAlwaysMode( !triggerAlwaysMode ); return; }
+	}
+	
+	
+	
 	if( selectionMode ){
 		selectionPolyLength = 0;
 		selectionPoly[selectionPolyLength].x = x;
@@ -621,32 +684,6 @@ void testApp::mousePressed(int x, int y, int button){
 		// perfectly fine to delete!
 		if( hovering == NULL ){
 			selection.clear();
-		}
-	}
-
-
-	// handle the buttons...
-	if( mouseX <= 30 ){
-		// choosing beat
-		for( int i = 0; i < 6; i++ ){
-			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 10+i*30.0, 20.0, 20.0 ) ){
-				beatMod = i;
-				return;
-			}
-		}
-
-		// choosing sound-shape
-		for( int i = 0; i < 4; i++ ){
-			if( this->inRect( mouseX*1.0, mouseY*1.0, 10, 220+i*30.0, 20.0, 20.0 ) ){
-				soundShape = i;
-				return;
-			}
-		}
-
-		// change trigger-mode
-		if( this->inRect( mouseX*1.0, mouseY*1.0, 10.0, 350.0, 20.0, 20.0 ) ){
-			triggerAlwaysMode = !triggerAlwaysMode;
-			return;
 		}
 	}
 
@@ -705,25 +742,13 @@ void testApp::mousePressed(int x, int y, int button){
 void testApp::mouseReleased(){
 	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
 
+	if( selectionMode && selectionPolyLength != 0 ){
+		endSelection();
+		return;
+	}
+	
 	if( chromaticMode ){
 		mouseY = Tones::snap( mouseY );
-	}
-
-	if( selectionMode ){
-		for( int i = 0; i < RECORDERS; i++ ){
-			pointRecorder *pr = &recorders[i];
-			if( pr->active() && pr->pts.size() > 0 && inPoly( selectionPoly, selectionPolyLength, pr->pts[0].pos ) ){
-				selection.push_back( pr );
-			}
-		}
-
-		// sort and shrink!
-		sort( selection.begin(), selection.end() );
-		unique( selection.begin(), selection.end() );
-
-		selectionMode = false;
-
-		return;
 	}
 
 	if( hovering != NULL && ofGetElapsedTimef() - lastMousePressed < 0.20 ){
@@ -883,42 +908,6 @@ void testApp::drawImage( ofImage * img, float x, float y, bool selected, float o
 		ofSetColor( 220, 220, 220 );
 		ofRect( x + 0.5, y + 0.5, 18, 18 );
 	}
-}
-
-
-// ------------------------
-bool testApp::inRect( float pX, float pY, float x, float y, float width, float height ){
-	return pX >= x && pX <= x + width && pY >= y && pY <= y + height;
-}
-
-// ------------------------
-bool testApp::inPoly(ofPoint *polygon,int N, ofPoint p ){
-	int counter = 0;
-	int i;
-	double xinters;
-	ofPoint p1,p2;
-
-	p1 = polygon[0];
-	for (i=1;i<=N;i++) {
-		p2 = polygon[i % N];
-		if (p.y > MIN(p1.y,p2.y)) {
-			if (p.y <= MAX(p1.y,p2.y)) {
-				if (p.x <= MAX(p1.x,p2.x)) {
-					if (p1.y != p2.y) {
-						xinters = (p.y-p1.y)*(p2.x-p1.x)/(p2.y-p1.y)+p1.x;
-						if (p1.x == p2.x || p.x <= xinters)
-							counter++;
-					}
-				}
-			}
-		}
-		p1 = p2;
-	}
-
-	if (counter % 2 == 0)
-		return false;
-	else
-		return true;
 }
 
 
@@ -1107,6 +1096,17 @@ void testApp::load(){
 }
 
 
+void testApp::clear(){
+	newBtn.activated(); 
+	
+	for( int i = 0; i < RECORDERS; i++ ){
+		//recorders[i].clear();
+		recorders[i].startTime = 0;
+		//players[i].suicide = true;
+	}
+}
+
+
 // ------------------------
 bool testApp::save( string filename ){
 
@@ -1173,4 +1173,78 @@ bool testApp::load( string filename ){
 		}
 	}
 	in.close();
+}
+
+
+
+// ------------------------
+void testApp::setBeatMod( int mod ){
+	beatBtns[beatMod].selected = false; 
+	beatMod = mod; 
+	beatBtns[beatMod].selected = true; 
+	beatBtns[beatMod].activated(); 
+}
+
+// ------------------------
+void testApp::setSoundShape( int newShape ){
+	shapeBtns[soundShape].selected = false; 
+	soundShape = newShape; 
+	shapeBtns[soundShape].selected = true; 
+	shapeBtns[soundShape].activated(); 
+}
+
+// ------------------------
+void testApp::startSelection( bool append ){
+	selectionMode = true; 
+	selectionPolyLength = 0;
+	
+	selectBtn.selected = true; 
+	selectBtn.activated();
+	selectBtn.forceAlpha = 1; 
+
+	
+	if( !append ){
+		selection.clear();
+	}
+}
+
+// ------------------------
+void testApp::endSelection(){
+	selectionMode = false; 
+	selectBtn.forceAlpha = -1; 
+	selectBtn.selected = false; 
+	
+	for( int i = 0; i < RECORDERS; i++ ){
+		pointRecorder *pr = &recorders[i];
+		if( pr->active() && pr->pts.size() > 0 && Helpers::inPoly( selectionPoly, selectionPolyLength, pr->pts[0].pos ) ){
+			selection.push_back( pr );
+		}
+	}
+	
+	// sort and shrink!
+	sort( selection.begin(), selection.end() );
+	unique( selection.begin(), selection.end() );
+}
+
+// ------------------------
+void testApp::setChromaticMode( bool enabled ){
+	chromaticMode = enabled; 
+	
+	chromaticBtn.selected = chromaticMode; 
+	if( enabled ) chromaticBtn.activated(); 
+}
+
+// ------------------------
+void testApp::setSignalVisualizer( bool enabled ){
+	showAudio = enabled; 
+	signalBtn.selected = enabled; 
+	
+	if( enabled ) signalBtn.activated(); 
+}
+
+// ------------------------
+void testApp::setTriggerAlwaysMode( bool always ){
+	triggerAlwaysMode = always; 
+	triggerBtn.image = always? &triggerAlwaysImg:&triggerOnceImg; 
+	triggerBtn.activated(); 
 }
