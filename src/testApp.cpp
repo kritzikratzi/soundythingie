@@ -81,7 +81,7 @@ void testApp::setup(){
 	selectBtn.init   ( X, Y, "select.png" );    X += selectBtn.w + D1;
 	chromaticBtn.init( X, Y, "chromatic.png" ); X += chromaticBtn.w + D1;
 	signalBtn.init   ( X, Y, "signal.png" );    X += signalBtn.w + D1;
-	triggerBtn.init  ( X, Y, "trigger.png" );   X += triggerBtn.w + D1 + D2;
+	triggerBtn.init( X, Y, "trigger_once.png" );X += triggerBtn.w + D1 + D2;
 	
 	
 	// now add all buttons to our buttons vector! 
@@ -103,6 +103,10 @@ void testApp::setup(){
 	buttons.push_back( &signalBtn ); 
 	buttons.push_back( &triggerBtn ); 
 	
+	// and activate the ones that are usually activated! 
+	beatBtns[1].selected = true; 
+	shapeBtns[1].selected = true; 
+	
 	bpmRates[0] =   0; bpmLastTriggered[0] = 0; bpmTriggerNow[0] = false;
 	bpmRates[5] =  20; bpmLastTriggered[1] = 0; bpmTriggerNow[1] = false;
 	bpmRates[4] =  30; bpmLastTriggered[2] = 0; bpmTriggerNow[2] = false;
@@ -114,6 +118,8 @@ void testApp::setup(){
 		recorders[i].index = i;
 	}
 
+	
+	showMenu = 17; 
 }
 
 //--------------------------------------------------------------
@@ -143,11 +149,9 @@ void testApp::update(){
 			beatBtns[i].flash(); 
 			bpmLastTriggered[i] += 60.0/bpmRates[i];
 			bpmTriggerNow[i] = true;
-			triggerAlpha[i] = 1;
 		}
 		else{
 			bpmTriggerNow[i] = false;
-			triggerAlpha[i] -= triggerAlpha[i]/(10+i*2.0);
 		}
 	}
 
@@ -369,7 +373,7 @@ void testApp::keyPressed  (int key){
 		toConsole = !toConsole;
 	}
 
-	if( key == 9 /* tab */ ){
+	if( key == 10 /* enter */ ){
 		for( int i = 1; i < 6; i++ ){
 			bpmLastTriggered[i] = ofGetElapsedTimef();
 		}
@@ -521,6 +525,22 @@ void testApp::keyPressed  (int key){
 	if( key == ',' ){
 		// IO::save( this, "test.txt" );
 		load();
+	}
+	
+	if( key == 9 /*tab*/ ){
+		switch( showMenu ){
+			case  0: showMenu = 10; break; 
+			case 10: showMenu = 17; break; 
+			case 17: showMenu = 0; break; 
+			default: showMenu = 17; break; 
+		}
+		
+		for( int i = 0; i < showMenu; i++ ){
+			buttons[i]->visible = true; 
+		}
+		for( int i = showMenu; i < buttons.size(); i++ ){
+			buttons[i]->visible = false; 
+		}
 	}
 }
 

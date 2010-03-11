@@ -42,11 +42,12 @@ void ImageButton::draw(){
 	image->draw( x, y );
 	
 	ofFill();
-	ofSetColor( 255, 255, 255, overlayAlphaIs*alphaIs*255 );
+	ofSetColor( 180, 180, 180, overlayAlphaIs*alphaIs*255 );
 	ofRect( x + 0.5, y + 0.5, w, h );
 	
 	ofNoFill();
-	ofSetColor( (((hover||selected)?0xFFFFFF:0x787878)&0x00FFFFFF) | (((int)alphaIs*255)<<24) ); 
+	int g = selected?0x99:(hover?0x78:0x00);
+	ofSetColor( g, g, g, alphaIs*255 ); 
 	ofRect( x + 0.5, y + 0.5, w, h );
 	
 	ofDisableAlphaBlending();

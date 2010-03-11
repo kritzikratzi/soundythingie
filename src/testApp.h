@@ -65,9 +65,7 @@ class testApp : public ofSimpleApp{
 		void setChromaticMode( bool enabled ); 
 		void setSignalVisualizer( bool enabled ); 
 		void setTriggerAlwaysMode( bool always ); 
-
-		float triggerAlpha[6];
-
+		
 		float			timeCounter;
 		float			timeOfLastFrame;
 
@@ -162,6 +160,9 @@ class testApp : public ofSimpleApp{
 		// sets...
 		vector<pointRecorder *> sets[12];
 		bool setEnabled[12];
+	
+		// how much of the menu should be visible? 
+		int showMenu; 
 };
 
 
