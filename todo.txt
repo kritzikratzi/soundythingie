@@ -1,43 +1,58 @@
-TODO: 
+FEATURES: 
 
-+ make lines deletable
-+ allow changing volume (use +/- keys)
 - change volume with scroll-wheel
-+ hook things up to beats
-+ key to delete everything 
 - something quite interresting happens when you hold down the window 
   scaling button - should be possible to do the same thing when pressing 
   space bar
+- make the space-bar the "live" key, where the mouse-velocity is played. 
+- make bars bigger/smaller according to volume
+- allow to change beat with 0...5 when selected/hovered
+- when curve is delete remove it along with the last runner
+- make runners friendlier? 
+- kids spawn off with the beat-subdivision that is selected (e.g. 0=1-> every single one, 2->every second one, etc.) 
+- allow lines to move while drawing the babysitter, this will make it much more understandable!!
+- maybe, instead of changing volume the ability to 
+  use a key to quickly duplicate a line
+  (with some x offset, or some random position around the original, 
+   also the line could be randomized to be a bit funkier) 
+- show regions of f1-f12 keys (remember the selection, or something 
+  like that)
+
+BUGS: 
+
+- saving/loading when fullscreen
+- wave forms are not correct right now, 
+  sin is chopped, 
+  rect+triangle seem too high. 
+- sometimes when dragging lines get distorted
+
+
+DONE: 
+
++ make lines deletable
++ allow changing volume (use +/- keys)
++ hook things up to beats
++ key to delete everything 
 + ability to clear out everything
 + show proper octaves and notes (c d e f g... ) super-light as an orientation. 
-- make the space-bar the "live" key, where the mouse-velocity is played. 
 + possibility to chose off-beats (?)
 + allow spawing from the middle of a line
++ selecting multiple nodes, then being able to delete, change volume, moving around
++ different wave forms (flat, rectangle, triangle, sinus)
   --------------------------- (1)
             \
              \___________ (2)
   
   the second line copies the player from line (1) as soon as it reaches
   the intersection. 
-~ saving and loading 
-+ selecting multiple nodes, then being able to delete, change volume, moving around
-+ different wave forms (flat, rectangle, triangle, sinus)
-- make bars bigger/smaller according to volume
++ saving and loading 
 + move instead of delete when touching on the circle
-- allow to change beat with 0...5 when selected/hovered
-- when curve is delete remove it along with the last runner
-- make runners friendlier? 
-- kids spawn off with the beat-subdivision that is selected (e.g. 0=1-> every single one, 2->every second one, etc.) 
 + add motion to the lines themselves
-- allow lines to move while drawing the babysitter, this will make it much more understandable!!
-- maybe, instead of changing volume the ability to 
-  use a key to quickly duplicate a line
-  (with some x offset, or some random position around the original, 
-   also the line could be randomized to be a bit funkier) 
 + bring all heads back into the screen
 
 
-maybe later (=not gonna happen)
+MAYBE LATER: (=not gonna happen)
+
 - when hovering over a potential spawn allow pressing "alt" to draw anywhere
 - drag to any edge to delete
 - use l ("link"), to link the beat directly to the generated beat, 

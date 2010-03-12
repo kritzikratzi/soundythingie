@@ -120,6 +120,7 @@ void testApp::setup(){
 
 	
 	showMenu = 17; 
+	setChromaticMode( true );
 }
 
 //--------------------------------------------------------------
