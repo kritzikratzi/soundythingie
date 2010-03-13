@@ -57,17 +57,15 @@ void pointRecorder::addPoint(ofPoint pt) {
 	
 	// on the first point, grab the start time
 	if (pts.size() == 0){
-		startTime = ofGetElapsedTimef();
+		//startTime = ofGetSystemTime();
 	} 
 	
 	
 	// combine the position and the time here: 
 	timePt	myPoint;
 	myPoint.pos			= pt;
-	myPoint.time		= ofGetElapsedTimef() - startTime;
+	myPoint.time		= (ofGetSystemTime() - startTime)/1000.0;
 	
-	cout << "creating point " << pts.size() << " at time: " << myPoint.time << endl;
-
 	pts.push_back(myPoint);
 	if (pts.size() > maxNumPts){
 		pts.erase(pts.begin());
@@ -83,7 +81,7 @@ void pointRecorder::reset( int beatMod ) {
 	bAmRecording = true;
 	volume = 0.1f;
 	startDelay = 0; 
-	startTime = 0; 
+	startTime = ofGetSystemTime(); 
 	enabled = true; 
 	
 	pts.clear();
@@ -126,7 +124,7 @@ ofPoint pointRecorder::getPointForTime(float time){
 	// ok here's how to do it.
 	// (a) if we have no points, or one point, or are recording return nothing...
 	
-	if (pts.size() <= 1 || bAmRecording) return ofPoint(0,0,0); 
+	if (pts.size() <= 1 /*|| bAmRecording*/) return ofPoint(0,0,0); 
 	
 	// (b) else, find out where we are for a given time 
 	// do something like a % operator with the time, 
@@ -140,10 +138,18 @@ ofPoint pointRecorder::getPointForTime(float time){
 	// for example, if are at time 11, we do 11 % 3, which equals 2, so we are at time 2....
 	
 	// now, we do that with floats, like this:
-	float totalTime = getDuration();
+	//float totalTime = getDuration();
+	//float timeInRange = time;
+	//while (timeInRange > totalTime){
+	//	timeInRange -= totalTime;
+	//}
+	//
+	// ^^^ actually... we don't need to do this anymore at all. 
+	// this is the new code: 
 	float timeInRange = time;
-	while (timeInRange > totalTime){
-		timeInRange -= totalTime;
+	if( time >= getDuration() ){
+		cout << "fake pos!" << endl; 
+		return pts[pts.size()-1].pos; 
 	}
 	
 	// ok we are looking for a point whose time is greater then timeInRange...
@@ -184,13 +190,23 @@ ofPoint pointRecorder::getVelocityForTime(float time){
 	// and to find a time slightly less... (prev position and current position).
 	
 	
-	if (pts.size() <= 1 || bAmRecording) return ofPoint(0,0,0); 
+	if (pts.size() <= 1 /*|| bAmRecording*/) return ofPoint(0,0,0); 
 	
-	float totalTime = getDuration();
+	/*float totalTime = getDuration();
 	float timeInRange = time;
 	while (timeInRange > totalTime){
 		timeInRange -= totalTime;
-	}
+	}*/
+/*	if( time >= getDuration() ){
+		ofPoint velocity; 
+		velocity.x = 0; 
+		velocity.y = 0; 
+
+		ofPoint prevPoint	= pts[pts.size()-1].
+		return velocity; 
+	}*/
+	
+	float timeInRange = time; 
 	
 	float prevTime = MAX(0, timeInRange - 0.016666f); // time minus 1/60 of a second....
 	//cout << timeInRange << " " << prevTime << endl;
@@ -332,42 +348,5 @@ void pointRecorder::load( ifstream& in, pointRecorder recorders[], pointPlayer p
 		
 		if( 0 == strcmp( cmd, "END" ) ) break; 
 	}
-	
-/*	out << "startTime:" << startTime << endl; 
-	out << "offsetX:" << offsetX << endl; 
-	out << "offsetY:" << offsetY << endl; 
-	out << "maxNumPts:" << maxNumPts << endl; 
-	out << "beatMod:" << beatMod << endl; 
-	out << "volume:" << volume << endl; 
-	
-	out << "timePt:"; 
-	for( int i = 0; i < pts.size(); i++ ){
-		out << pts[i].time << " " << pts[i].pos.x << " " << pts[i].pos.y << " "; 
-	}
-	out << "-1" << endl;
-	
-	out << "kids:"; 
-	for( int i = 0; i < kids.size(); i++ ){
-		out << kids[i]->index << " "; 
-	}
-	out << "-1" << endl; 
-	
-	out << "kidPointNr:"; 
-	for( int i = 0; i < kidPointNr.size(); i++ ){
-		out << kidPointNr[i]; 
-	}
-	out << endl; 
-	
-	out << "babysitting:"; 
-	for( int i = 0; i < babysitting.size(); i++ ){
-		out << babysitting[i]->index; 
-	}
-	out << endl; 
-	
-	out << "soundShape:" << soundShape << endl; 
-	out << "enabled:" << enabled << endl; 
-	out << "triggerAlways:" << triggerAlways << endl;
-	out << "startDelay:" << startDelay << endl; 
-	out << "END:";*/
 }
 

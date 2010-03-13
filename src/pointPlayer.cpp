@@ -34,7 +34,7 @@ void pointPlayer::setup( pointRecorder * pr ){
 	dead				= false; 
 	timeOfLastFrame		= ofGetElapsedTimef(); 
 	startTime			= ofGetElapsedTimef(); 
-	startDelay			= pr->startDelay; 
+	// startDelay			= pr->startDelay; 
 	
 	// calculate attack and release time (50ms)
 	attackTime = fmin( 0.1, this->pr->getDuration()/10 ); // max 0.1s or 10% attack time! 
@@ -60,10 +60,12 @@ void pointPlayer::update(){
 	samplesSinceUpdate = 0; 
 	
 	//cout << this->pr->bAmRecording << "--" << this->pr->pts.size() << "--" << timeCounter << "--" << this->pr->getDuration() << endl; 
-	if ( this->pr != NULL && this->pr->bAmRecording == false && this->pr->pts.size() > 1){
-		if( timeCounter >= this->pr->getDuration() ){
+	if ( this->pr != NULL && /*this->pr->bAmRecording == false &&*/ this->pr->pts.size() > 1){
+		if( !this->pr->bAmRecording && timeCounter >= this->pr->getDuration() ){
 			// kill myself? 
 			suicide = true; 
+			cout << "DIE OF OTHER THINGS!" << endl; 
+			cout << this->pr->bAmRecording << endl; 
 		}
 		else{
 			doCrazyMath( false ); 
@@ -71,6 +73,7 @@ void pointPlayer::update(){
 	}
 	else{
 		// DIE BECAUSE OF UNEMPLOYMENT!
+		cout << "DIE OF UNEMPLOYMENT" << endl; 
 		suicide = true; 
 		volume = 0;
 		amplitude = 0; 
@@ -93,7 +96,7 @@ void pointPlayer::draw(){
 	ofFill();
 	ofSetRectMode(OF_RECTMODE_CENTER);
 	// if we are not recording, get the point for a given time: 
-	if (pr->bAmRecording == false && pr->pts.size() > 1){
+	if (/*pr->bAmRecording == false &&*/ pr->pts.size() > 1){
 		
 		ofPoint vel = pr->getVelocityForTime(timeCounter);
 		ofPoint pt = pr->getPointForTime(timeCounter);
@@ -128,7 +131,6 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 	float envelopeScaleTarget = 1; 
 	//amplitude = 0.1; 
 	
-	
 	float (*shapeFunc)(float);
 	if( pr->soundShape == 0 ) shapeFunc = &shapeFlat; 
 	if( pr->soundShape == 1 ) shapeFunc = &shapeSinus; 
@@ -151,7 +153,7 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		rightScale = pan; 
 		
 		//phaseAdder = 0.99f * phaseAdder + 0.01f * phaseAdderTarget;
-		if( useEnvelope ){
+		if( useEnvelope && this->pr->bAmRecording == false && false ){
 			float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0 + i/44100.0;
 			
 			if( actualTime < attackTime ){
@@ -208,7 +210,7 @@ void pointPlayer::doCrazyMath( bool apply ){
 	//amplitude = 0.94f * amplitude + 0.06f *( powf((lengthOfVel / 40.0f),2.0) * 0.5f);
 	amplitudeTarget = powf((lengthOfVel / 40.0f),2.0) * 0.5f; 
 	panTarget = fmin( 1, fmax( 0, pt.x/(float)ofGetWidth() ) ); 
-	float height = (float)ofGetHeight();
+	//float height = (float)ofGetHeight();
 	//float heightPct = ((height-pt.y) / height);
 	//targetFrequency = 5000.0f * heightPct;
 	targetFrequency = Tones::fValue( pt.y ); 

@@ -16,7 +16,8 @@ void testApp::setup(){
 	bFullscreen	= false;
 	useEnvelope = true;
 	timeCounter			= 0;
-	timeOfLastFrame		= ofGetElapsedTimef();
+	timeOfFrame			= ofGetSystemTime();
+	timeOfLastFrame		= ofGetSystemTime(); 
 	lastMousePressed = 0;
 	// ------------------------------------ audio stuff:
 	// 2 output channels,
@@ -120,12 +121,13 @@ void testApp::setup(){
 
 	
 	showMenu = 17; 
-	setChromaticMode( true );
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-
+	timeOfLastFrame = timeOfFrame; 
+	timeOfFrame = ofGetSystemTime(); 
+	
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].update();
@@ -162,16 +164,57 @@ void testApp::update(){
 			// Lines with beatMod 0 are only triggered if there is no
 			// player already
 			if( recorders[i].beatMod == 0 ){
-				if( playersOfRecorders[i].size() == 0 ){
-					pairUpWithAnyPlayer( &recorders[i] );
+				//if( playersOfRecorders[i].size() == 0 ){
+				//	pairUpWithAnyPlayer( &recorders[i] );
+				//}
+				// what time should it trigger?
+				// startTime + k*duration, 
+				// where k is in Z
+				// so basically we live in the group R/~duration
+				int now = (timeOfFrame-recorders[i].startTime)% (int)(recorders[i].getDuration()*1000);
+				int before = (timeOfLastFrame-recorders[i].startTime)%(int)(recorders[i].getDuration()*1000); 
+				if( before > now ){
+					// yep, we shall trigger! 
+					pairUpWithAnyPlayer( &recorders[i] ); 
 				}
+				
 			}
 			// Lines with beatMod >0 are always triggered, except if they
 			// are babysitters for other lines then they also are triggered
 			// only if there is no other line.
 			else if( recorders[i].beatMod > 0 ){
-				if( bpmTriggerNow[ recorders[i].beatMod ] && ( recorders[i].triggerAlways == true || playersOfRecorders[i].size() == 0 ) ){
+				// old: 
+				/*if( bpmTriggerNow[ recorders[i].beatMod ] && ( recorders[i].triggerAlways == true || playersOfRecorders[i].size() == 0 ) ){
 					pairUpWithAnyPlayer( &recorders[i] );
+				}*/
+				// new: 
+				// option 1: trigger always mode is on
+				if( recorders[i].triggerAlways == true ){
+					// right, so when should we trigger here? 
+					// of course at startTime + k*60/bpm
+					// same procedure as above: 
+					int now = (timeOfFrame-recorders[i].startTime)%(int)(1000*60/bpmRates[recorders[i].beatMod]);
+					int before = (timeOfLastFrame-recorders[i].startTime)%(int)(1000*60/bpmRates[recorders[i].beatMod]);
+					if( before > now ){
+						pairUpWithAnyPlayer( &recorders[i] ); 
+					}
+				}	
+				// option 2: trigger always mode is off
+				else{
+					// when to trigger now? 
+					// the only thing to figure out is the length of a loop. 
+					// it is the duration + the waiting period when it syncs up with the bpm again! 
+					// and that waiting period is obiously
+					// bpmLoopLength - (duration%bpmLoopLength)
+					int bpmLoopLength = 1000*60/bpmRates[ recorders[i].beatMod ]; 
+					int wait = bpmLoopLength - ( (int)(1000*recorders[i].getDuration()) % bpmLoopLength ); 
+					int total = (int)(1000*recorders[i].getDuration()) + wait; 
+					
+					int now = (timeOfFrame-recorders[i].startTime)%total;
+					int before = (timeOfLastFrame-recorders[i].startTime)%total;
+					if( before > now ){
+						pairUpWithAnyPlayer( &recorders[i] ); 
+					}
 				}
 			}
 		}
@@ -749,7 +792,7 @@ void testApp::mousePressed(int x, int y, int button){
 				recording->startDelay = ofGetElapsedTimef() - bpmLastTriggered[beatMod];
 				cout << recording->startDelay << endl;
 			}
-
+			
 			return;
 		}
 	}
@@ -780,7 +823,7 @@ void testApp::mouseReleased(){
 
 
 	if( recording != NULL ){
-		if( recording->pts.size() >= 1 ){
+		if( recording->pts.size() > 1 ){
 			recording->addPoint( ofPoint(mouseX, mouseY,0) );
 			recording->bAmRecording = false;
 		}
@@ -849,13 +892,13 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 		rAudio[i] = fmin( +2, fmax( -2, output[i*nChannels+1] ) );
 	}
 
-	if( toConsole ){
+	/*if( toConsole ){
 		cout << "-----------------------" << endl;
 		for( int i = 0; i < 256; i++ ){
 			cout << output[i*nChannels] << ":" << output[i*nChannels+1] << ", ";
 		}
 		cout << endl;
-	}
+	}*/
 
 }
 

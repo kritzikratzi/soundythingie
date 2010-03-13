@@ -34,7 +34,7 @@ class pointRecorder {
 		void save( ofstream& out ); 
 		void load( ifstream& in, pointRecorder recorders[], pointPlayer players[] );
 		
-		float				startTime;
+		long				startTime;
 		int					maxNumPts;
 		vector <timePt>		pts;
 	

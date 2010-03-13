@@ -67,8 +67,8 @@ class testApp : public ofSimpleApp{
 		void setTriggerAlwaysMode( bool always ); 
 		
 		float			timeCounter;
-		float			timeOfLastFrame;
-
+		long			timeOfLastFrame;
+		long			timeOfFrame; 
 
 		// --------------- for the audio
 		void audioRequested(float * input, int bufferSize, int nChannels);
