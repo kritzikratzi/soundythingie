@@ -163,6 +163,10 @@ class testApp : public ofSimpleApp{
 	
 		// how much of the menu should be visible? 
 		int showMenu; 
+	
+		// old width/height for scaling
+		int oldWidth; 
+		int oldHeight; 
 };
 
 

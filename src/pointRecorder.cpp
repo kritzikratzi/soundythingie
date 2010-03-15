@@ -237,6 +237,9 @@ void pointRecorder::save( ofstream& out ){
 		return; 
 	}
 	
+	float SCALE_X = 800.0/ofGetWidth();
+	float SCALE_Y = 600.0/ofGetHeight(); 
+	
 	out << "startTime:" << startTime << endl; 
 	out << "offsetX:" << offsetX << endl; 
 	out << "offsetY:" << offsetY << endl; 
@@ -251,7 +254,7 @@ void pointRecorder::save( ofstream& out ){
 	
 	out << "timePt:"; 
 	for( int i = 0; i < pts.size(); i++ ){
-		out << pts[i].time << " " << pts[i].pos.x << " " << pts[i].pos.y << " "; 
+		out << pts[i].time << " " << (SCALE_X*pts[i].pos.x) << " " << (SCALE_Y*pts[i].pos.y) << " "; 
 	}
 	out << "-1" << endl;
 	
@@ -282,6 +285,10 @@ void pointRecorder::load( ifstream& in, pointRecorder recorders[], pointPlayer p
 	// Manually set this to false! 
 	bAmRecording = false; 
 
+	float SCALE_X = ofGetWidth()/800.0;
+	float SCALE_Y = ofGetHeight()/600.0; 
+	
+	
 	while( !in.eof() ){
 		Helpers::readCommand( cmd, in ); 
 		
@@ -314,6 +321,8 @@ void pointRecorder::load( ifstream& in, pointRecorder recorders[], pointPlayer p
 				point.pos = ofPoint(0,0);
 				in >> point.pos.x; 
 				in >> point.pos.y; 
+				point.pos.x *= SCALE_X; 
+				point.pos.y *= SCALE_Y; 
 				point.time = t;
 				pts.push_back( point ); 
 				in >> t; 

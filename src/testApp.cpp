@@ -72,8 +72,8 @@ void testApp::setup(){
 	
 	shapeBtns[0].init( X, Y, "shape_flat.png" );      X += shapeBtns[0].w + D1;
 	shapeBtns[1].init( X, Y, "shape_sinus.png" );     X += shapeBtns[1].w + D1;
-	shapeBtns[2].init( X, Y, "shape_rectangle.png" ); X += shapeBtns[2].w + D1;
-	shapeBtns[3].init( X, Y, "shape_sawtooth.png" );  X += shapeBtns[3].w + D1 + D2;
+	shapeBtns[2].init( X, Y, "shape_sawtooth.png" ); X += shapeBtns[2].w + D1;
+	shapeBtns[3].init( X, Y, "shape_rectangle.png" );  X += shapeBtns[3].w + D1 + D2;
 	
 	newBtn.init ( X, Y, "new.png" );  X += newBtn.w + D1;
 	loadBtn.init( X, Y, "load.png" ); X += loadBtn.w + D1;
@@ -121,10 +121,32 @@ void testApp::setup(){
 
 	
 	showMenu = 17; 
+	oldWidth = ofGetWidth(); 
+	oldHeight = ofGetHeight();
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
+	
+	// First things first... scale everything... if needed! 
+	if( ofGetWidth() != oldWidth || ofGetHeight() != oldHeight ){
+		float w = ofGetWidth(); 
+		float h = ofGetHeight(); 
+		
+		for( int i = 0; i < RECORDERS; i++ ){
+			if( recorders[i].startTime != 0 ){
+				for( int j = 0; j < recorders[i].pts.size(); j++ ){
+					recorders[i].pts[j].pos.x *= w/oldWidth; 
+					recorders[i].pts[j].pos.y *= h/oldHeight; 
+					//recorders[i].volume *= (oldWidth+oldHeight)/(w+h);
+				}
+			}
+		}
+			
+		oldWidth = w; 
+		oldHeight = h; 
+	}
+	
 	timeOfLastFrame = timeOfFrame; 
 	timeOfFrame = ofGetSystemTime(); 
 	
