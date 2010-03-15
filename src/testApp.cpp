@@ -766,6 +766,7 @@ void testApp::mousePressed(int x, int y, int button){
 		if( recorders[i].startTime == 0 ){
 			recording = &recorders[i];
 			recording->reset( this->beatMod );
+			recording->startTime = ofGetSystemTime(); 
 			recording->soundShape = soundShape;
 			recording->triggerAlways = triggerAlwaysMode;
 
@@ -1054,7 +1055,7 @@ void testApp::save(){
 	//CFPreferencesSetAppValue(CFSTR("currentDirectory"), ref, CFSTR("org.sd.soundythingie") );
 	//CFPreferencesAppSynchronize( CFSTR("org.sd.soundythingie") );
 
-	save( finalURL );
+	save( finalURL ); 
 	#endif
 
 	#ifdef __WIN32__
@@ -1135,7 +1136,7 @@ void testApp::load(){
 	Boolean bool1 = CFStringGetCString(cfString,folderURL,kBufferSize,kCFStringEncodingMacRoman);
 
 
-	save( string( folderURL ) );
+	load( string( folderURL ) );
 
 	#endif
 

@@ -38,6 +38,7 @@ void pointPlayer::setup( pointRecorder * pr ){
 	
 	// calculate attack and release time (50ms)
 	attackTime = fmin( 0.1, this->pr->getDuration()/10 ); // max 0.1s or 10% attack time! 
+	attackTime = fmax( 0.05, attackTime ); // at least 50ms attack! 
 	releaseTime = this->pr->getDuration() - attackTime; 
 	doCrazyMath( true ); 
 	envelopeScale = 0; 
@@ -138,7 +139,6 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 	if( pr->soundShape == 3 ) shapeFunc = &shapeRectangle;
 	
 	//pan = 0.95f * pan + 0.05f * panTarget;
-	int cycle = 0; 
 	for (int i = 0; i < bufferSize; i++){
 		     if( fabs( pan-panTarget) < 0.0001 ) ; //nothing happens! 
 		else if( pan < panTarget ) pan += 0.0001; 
@@ -153,16 +153,15 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		rightScale = pan; 
 		
 		//phaseAdder = 0.99f * phaseAdder + 0.01f * phaseAdderTarget;
-		if( useEnvelope && this->pr->bAmRecording == false && false ){
+		if( useEnvelope && this->pr->bAmRecording == false ){
 			float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0 + i/44100.0;
 			
-			if( actualTime < attackTime ){
-				cycle = 1; 
-				envelopeScaleTarget = fmin( 1, 1 - ( attackTime - actualTime ) / attackTime ); 
-			}
-			else if( actualTime > releaseTime ){
-				cycle = 2; 
+			// give the release time priority over attack time! 
+			if( actualTime > releaseTime ){
 				envelopeScaleTarget = fmax( 0, 1 - ( actualTime - releaseTime) / ( this->pr->getDuration() - releaseTime ) );
+			}
+			else if( actualTime < attackTime ){
+				envelopeScaleTarget = fmin( 1, 1 - ( attackTime - actualTime ) / attackTime ); 
 			}
 			else{
 				envelopeScaleTarget = 1; 
@@ -187,8 +186,6 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		output[i*nChannels + 1] += sample * amplitude * (volume*10) * rightScale * envelopeScale;
 	}
 	
-	
-	//cout << env << "," << (cycle==0?"F":cycle==1?"A":"R") << endl; 
 	
 	this->samplesSinceUpdate ++; 
 }

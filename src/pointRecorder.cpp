@@ -81,7 +81,7 @@ void pointRecorder::reset( int beatMod ) {
 	bAmRecording = true;
 	volume = 0.1f;
 	startDelay = 0; 
-	startTime = ofGetSystemTime(); 
+	startTime = 0; 
 	enabled = true; 
 	
 	pts.clear();
