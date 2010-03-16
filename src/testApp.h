@@ -10,6 +10,7 @@
 
 
 #include "ofMain.h"
+#include "ofAppGlutWindow.h"
 
 //#include "ofAddons.h"
 #include <algorithm>
@@ -32,7 +33,6 @@ class ImageButton;
 class testApp : public ofSimpleApp{
 
 	public:
-
 		void setup();
 		void update();
 		void draw();
@@ -48,7 +48,6 @@ class testApp : public ofSimpleApp{
 		void deleteRecorder( pointRecorder * rec );
 		void deleteRecordersKids( pointRecorder * rec );
 		void moveRecorder( pointRecorder * rec, int dx, int dy, bool moveKids );
-		void drawImage( ofImage * img, float x, float y, bool selected = false, float overlay = 0 );
 		bool save( string filename );
 		bool load( string filename );
 	
@@ -65,6 +64,7 @@ class testApp : public ofSimpleApp{
 		void setChromaticMode( bool enabled ); 
 		void setSignalVisualizer( bool enabled ); 
 		void setTriggerAlwaysMode( bool always ); 
+		void setHelpMode( bool enabled ); 
 		
 		float			timeCounter;
 		long			timeOfLastFrame;
@@ -103,9 +103,9 @@ class testApp : public ofSimpleApp{
 
 		ofImage beatImgs[6];
 		ofImage shapeImgs[4];
-		ofImage selectionImg;
 		ofImage triggerAlwaysImg;
 		ofImage triggerOnceImg;
+		ofImage helpTextImg;
 	
 		// and the according buttons! 
 		ImageButton beatBtns[6];
@@ -118,6 +118,7 @@ class testApp : public ofSimpleApp{
 		ImageButton saveBtn;
 		ImageButton selectBtn;
 		ImageButton signalBtn;
+		ImageButton helpBtn;
 	
 		vector<ImageButton *> buttons; 
 		
@@ -129,6 +130,7 @@ class testApp : public ofSimpleApp{
 		bool selectionMode;
 		bool holdSpawnMode; // "hold spawn" mode
 		bool triggerAlwaysMode; // always trigger?
+		bool helpMode; // show help? 
 
 		// which recorder are we currently hovering over, or null
 		pointRecorder * hovering;

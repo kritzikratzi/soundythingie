@@ -51,11 +51,13 @@ void testApp::setup(){
 	toConsole = false;
 	holdSpawnMode = false;
 	triggerAlwaysMode = false;
+	helpMode = false; 
 
 
 	// load images...
 	triggerAlwaysImg.loadImage( "trigger_always.png" );
 	triggerOnceImg.loadImage( "trigger_once.png" );
+	helpTextImg.loadImage( "help_text.png" ); 
 
 	// And buttons! 
 	int X = 15; 
@@ -82,7 +84,8 @@ void testApp::setup(){
 	selectBtn.init   ( X, Y, "select.png" );    X += selectBtn.w + D1;
 	chromaticBtn.init( X, Y, "chromatic.png" ); X += chromaticBtn.w + D1;
 	signalBtn.init   ( X, Y, "signal.png" );    X += signalBtn.w + D1;
-	triggerBtn.init( X, Y, "trigger_once.png" );X += triggerBtn.w + D1 + D2;
+	triggerBtn.init( X, Y, "trigger_once.png" );X += triggerBtn.w + D1;
+	helpBtn.init     ( X, Y, "help.png" );      X += triggerBtn.w + D1 + D2;
 	
 	
 	// now add all buttons to our buttons vector! 
@@ -103,6 +106,7 @@ void testApp::setup(){
 	buttons.push_back( &chromaticBtn ); 
 	buttons.push_back( &signalBtn ); 
 	buttons.push_back( &triggerBtn ); 
+	buttons.push_back( &helpBtn ); 
 	
 	// and activate the ones that are usually activated! 
 	beatBtns[1].selected = true; 
@@ -120,7 +124,7 @@ void testApp::setup(){
 	}
 
 	
-	showMenu = 17; 
+	showMenu = 18; 
 	oldWidth = ofGetWidth(); 
 	oldHeight = ofGetHeight();
 }
@@ -186,9 +190,6 @@ void testApp::update(){
 			// Lines with beatMod 0 are only triggered if there is no
 			// player already
 			if( recorders[i].beatMod == 0 ){
-				//if( playersOfRecorders[i].size() == 0 ){
-				//	pairUpWithAnyPlayer( &recorders[i] );
-				//}
 				// what time should it trigger?
 				// startTime + k*duration, 
 				// where k is in Z
@@ -205,11 +206,6 @@ void testApp::update(){
 			// are babysitters for other lines then they also are triggered
 			// only if there is no other line.
 			else if( recorders[i].beatMod > 0 ){
-				// old: 
-				/*if( bpmTriggerNow[ recorders[i].beatMod ] && ( recorders[i].triggerAlways == true || playersOfRecorders[i].size() == 0 ) ){
-					pairUpWithAnyPlayer( &recorders[i] );
-				}*/
-				// new: 
 				// option 1: trigger always mode is on
 				if( recorders[i].triggerAlways == true ){
 					// right, so when should we trigger here? 
@@ -271,6 +267,20 @@ void testApp::update(){
 	for( int i = 0; i < buttons.size(); i++ ){
 		buttons[i]->update( mouseX, mouseY ); 
 	}
+	
+	// Now save if needed! 
+	if( ( loadBtn.selected || saveBtn.selected ) && ( ofGetWidth() == ofGetScreenWidth() && ofGetHeight() == ofGetScreenHeight() ) ){
+		bFullscreen = false; 
+		ofSetFullscreen( false ); 
+	}
+	else if( loadBtn.selected ){
+		load(); 
+		loadBtn.selected = false; 
+	}
+	else if( saveBtn.selected ){
+		save(); 
+		saveBtn.selected = false; 
+	}
 }
 
 //--------------------------------------------------------------
@@ -317,26 +327,6 @@ void testApp::draw(){
 	ofNoFill();
 	ofSetLineWidth( 1 );
 
-	/*// Draw beat-images
-	for( int i = 0; i < 6; i++ ){
-		// draw images...
-		int alpha = 120*triggerAlpha[i];
-		bool selected =
-			Helpers::inRect( mouseX*1.0, mouseY*1.0, 10.0, 10.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
-			i == beatMod; // selected
-
-		drawImage( &beatImgs[i], 10, 10+i*30, selected, alpha );
-	}
-
-	// Draw images for wave forms...
-	for( int i = 0; i < 4; i++ ){
-		bool selected = Helpers::inRect( mouseX*1.0, mouseY*1.0, 10.0, 220.0+i*30.0, 20.0, 20.0 ) ||  // mouseover
-		soundShape == i; // selected
-		drawImage( &shapeImgs[i], 10, 220+i*30, selected );
-	}
-
-	bool triggerHovering = Helpers::inRect( mouseX*1.0, mouseY*1.0, 10.0, 350.0, 20.0, 20.0 );
-	drawImage( triggerAlwaysMode?&triggerAlwaysImg:&triggerOnceImg, 10.0, 350.0, triggerHovering );*/
 	for( int i = 0; i < buttons.size(); i++ ){
 		buttons[i]->draw(); 
 	}
@@ -349,14 +339,6 @@ void testApp::draw(){
 	}
 
 	if( selectionMode ){
-		ofSetRectMode(OF_RECTMODE_CORNER);
-		ofEnableAlphaBlending();
-		ofSetColor( 0xFFFFFF );
-		selectionImg.draw( 10, 10+6*30 );
-		//selectionImg.draw( mouseX + 15, mouseY + 20 );
-		ofDisableAlphaBlending();
-
-
 		ofNoFill();
 		glEnable(GL_LINE_STIPPLE);
 		glLineStipple( 2, 0xF0F0 );
@@ -395,6 +377,7 @@ void testApp::draw(){
 	}
 
 	if( showAudio ){
+		ofPushMatrix(); 
 		int graphW = 107;
 		int graphH = 107;
 		ofSetLineWidth( 1 );
@@ -410,6 +393,15 @@ void testApp::draw(){
 			ofLine(   0 + i, 100,   0 + i ,100 + lAudio[i] * 100.0f );
 			ofLine( 300 + i, 100, 300 + i ,100 + rAudio[i] * 100.0f );
 		}
+		ofPopMatrix(); 
+	}
+	
+	if( helpMode ){
+		ofSetRectMode(OF_RECTMODE_CORNER);
+		ofEnableAlphaBlending(); 
+		ofSetColor( 255, 255, 255 ); 
+		helpTextImg.draw( 0, 0 );
+		ofDisableAlphaBlending(); 
 	}
 }
 
@@ -586,19 +578,21 @@ void testApp::keyPressed  (int key){
 
 	if( key == '.' ){
 		// IO::save( this, "test.txt" );
-		save();
+		//save();
+		saveBtn.selected = true; 
 	}
 	if( key == ',' ){
 		// IO::save( this, "test.txt" );
-		load();
+		//load();
+		loadBtn.selected = true; 
 	}
 	
 	if( key == 9 /*tab*/ ){
 		switch( showMenu ){
 			case  0: showMenu = 10; break; 
-			case 10: showMenu = 17; break; 
-			case 17: showMenu = 0; break; 
-			default: showMenu = 17; break; 
+			case 10: showMenu = 18; break; 
+			case 18: showMenu = 0; break; 
+			default: showMenu = 18; break; 
 		}
 		
 		for( int i = 0; i < showMenu; i++ ){
@@ -720,6 +714,12 @@ void testApp::mousePressed(int x, int y, int button){
 	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
 	lastMousePressed = ofGetElapsedTimef();
 
+	
+	if( helpMode && y > 85 ){
+		setHelpMode( false ); 
+		return; 
+	}
+	
 	if( chromaticMode ){
 		y = Tones::snap( y );
 	}
@@ -740,8 +740,8 @@ void testApp::mousePressed(int x, int y, int button){
 		if( shapeBtns[3].hover ){ setSoundShape( 3 ); return; }
 		
 		if( newBtn.hover ){ clear(); return; }
-		if( saveBtn.hover ){ save(); return; }
-		if( loadBtn.hover ){ load(); return; }
+		if( saveBtn.hover ){ saveBtn.selected = true; return; }
+		if( loadBtn.hover ){ loadBtn.selected = true; return; }
 		if( selectBtn.hover ){ 
 			if( selectionMode )
 				endSelection();
@@ -753,6 +753,7 @@ void testApp::mousePressed(int x, int y, int button){
 		if( chromaticBtn.hover ){ setChromaticMode( !chromaticMode ); return; }
 		if( signalBtn.hover ){ setSignalVisualizer( !showAudio ); return; }
 		if( triggerBtn.hover ){ setTriggerAlwaysMode( !triggerAlwaysMode ); return; }
+		if( helpBtn.hover ){ setHelpMode( !helpMode ); return; }
 	}
 	
 	
@@ -975,27 +976,6 @@ void testApp::moveRecorder( pointRecorder * rec, int dx, int dy, bool moveKids )
 	}
 }
 
-// ------------------------
-void testApp::drawImage( ofImage * img, float x, float y, bool selected, float overlay ){
-	ofEnableAlphaBlending();
-	ofSetColor( 0x999999 );
-	img->draw( x, y );
-
-	ofFill();
-	ofSetColor( 255, 255, 255, overlay );
-	ofRect( x + 0.5, y + 0.5, 18, 18 );
-
-	ofNoFill();
-	ofSetColor( 120, 120, 120 );
-	ofRect( x + 0.5, y + 0.5, 18, 18 );
-
-	ofDisableAlphaBlending();
-
-	if( selected ){
-		ofSetColor( 220, 220, 220 );
-		ofRect( x + 0.5, y + 0.5, 18, 18 );
-	}
-}
 
 
 // ------------------------
@@ -1334,4 +1314,11 @@ void testApp::setTriggerAlwaysMode( bool always ){
 	triggerAlwaysMode = always; 
 	triggerBtn.image = always? &triggerAlwaysImg:&triggerOnceImg; 
 	triggerBtn.activated(); 
+}
+
+// ------------------------
+void testApp::setHelpMode( bool enabled ){
+	helpMode = enabled; 
+	helpBtn.selected = enabled; 
+	helpBtn.activated(); 
 }
