@@ -48,6 +48,7 @@ class testApp : public ofSimpleApp{
 		void deleteRecorder( pointRecorder * rec );
 		void deleteRecordersKids( pointRecorder * rec );
 		void moveRecorder( pointRecorder * rec, int dx, int dy, bool moveKids );
+		void cleanup(); 
 		bool save( string filename );
 		bool load( string filename );
 	
@@ -168,7 +169,7 @@ class testApp : public ofSimpleApp{
 	
 		// old width/height for scaling
 		int oldWidth; 
-		int oldHeight; 
+		int oldHeight;
 };
 
 

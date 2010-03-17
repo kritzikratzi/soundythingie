@@ -154,6 +154,10 @@ void testApp::update(){
 	timeOfLastFrame = timeOfFrame; 
 	timeOfFrame = ofGetSystemTime(); 
 	
+	// update all non-suicidal players. 
+	// all the suicidal but not dead players 
+	// need to be removed from the playersOfRecorders association vector
+	// (it's late, that might not make much sense)
 	for( int i = 0; i < PLAYERS; i++ ){
 		if( !players[i].suicide ){
 			players[i].update();
@@ -421,7 +425,6 @@ void testApp::pairUpWithAnyPlayer( pointRecorder * pr ){
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
 	glutModifiers = glutGetModifiers(); // can only be done in "core input callback"
-	cout << key << endl; 
 	// set beat-mod using the keyboard
 	if( key >= '0' && key <= '5' ){
 		setBeatMod( key - '0' ); 
@@ -484,7 +487,7 @@ void testApp::keyPressed  (int key){
 
 		// empty selection!
 		selection.clear();
-		cout << "CLEARED SEL REC: " << selection.size() << endl;
+		cleanup(); 
 	}
 
 	if( key == 'q' ) setSoundShape( 0 ); 
@@ -686,8 +689,8 @@ void testApp::mouseDragged(int x, int y, int button){
 	// move, but only if shift is not pressed!
 	if( hovering != NULL && ( glutModifiers & GLUT_ACTIVE_SHIFT ) == 0 ){
 		bool moveKids = (glutModifiers & GLUT_ACTIVE_ALT) == 0;
-		cout << glutModifiers << endl;
-		cout << "move kids? " << moveKids << endl;
+		//cout << glutModifiers << endl;
+		//cout << "move kids? " << moveKids << endl;
 		float dx = -hovering->pts[0].pos.x + x;
 		float dy = -hovering->pts[0].pos.y + y;
 		moveRecorder( hovering, dx, dy, moveKids );
@@ -798,7 +801,6 @@ void testApp::mousePressed(int x, int y, int button){
 				pointRecorder * rec = &recorders[spawnFocusRecorder];
 				rec->kids.push_back( recording );
 				rec->kidPointNr.push_back( spawnFocusPoint );
-				cout << "ADDED KID!!!!" << endl;
 				ofPoint p = rec->pts[spawnFocusPoint].pos;
 				recording->addPoint( p );
 				recording->beatMod = -1; // this will never launch it's own players!
@@ -808,13 +810,22 @@ void testApp::mousePressed(int x, int y, int button){
 				recording->babysitting.push_back( hovering );
 				recording->triggerAlways = false;
 				hovering->babysitter = recording;
+				// also add all other selected nodes. this should be fun! 
+				for( vector<pointRecorder *>::iterator pr = selection.begin(); pr != selection.end(); ++pr ){
+					if( (*pr) != hovering ){
+						(*pr)->babysitter = recording; 
+						(*pr)->babysitterX = (*pr)->pts[0].pos.x-mouseX; 
+						(*pr)->babysitterY = (*pr)->pts[0].pos.y-mouseY; 
+						recording->babysitting.push_back( (*pr) ); 
+					}
+				}
+				
 			}
 
 			// no one's spawn (parenting or normal)
 			// and on a classic beat
 			if( spawnFocusRecorder < 0 && beatMod > 0 ){
 				recording->startDelay = ofGetElapsedTimef() - bpmLastTriggered[beatMod];
-				cout << recording->startDelay << endl;
 			}
 			
 			return;
@@ -842,6 +853,7 @@ void testApp::mouseReleased(){
 	if( hovering != NULL && ofGetElapsedTimef() - lastMousePressed < 0.20 ){
 		deleteRecorder( hovering );
 		hovering = NULL;
+		cleanup(); 
 	}
 
 
@@ -897,7 +909,7 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 				vector<pointRecorder*> * vec = &players[i].pr->babysitting;
 				ofPoint * targetPos = &players[i].currentPoint;
 				for (vector<pointRecorder *>::iterator pr = vec->begin(); pr != vec->end(); ++pr ){
-					this->moveRecorder( *pr, targetPos->x-(*pr)->pts[0].pos.x, targetPos->y-(*pr)->pts[0].pos.y, true );
+					this->moveRecorder( *pr, targetPos->x-(*pr)->pts[0].pos.x+(*pr)->babysitterX, targetPos->y-(*pr)->pts[0].pos.y+(*pr)->babysitterY, true );
 				}
 
 				for( int i =0; i < RECORDERS; i++ ){
@@ -911,11 +923,12 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 		}
 	}
 
-	for( int i = 0; i < 256; i++ ){
-		lAudio[i] = fmin( +2, fmax( -2, output[i*nChannels] ) );
-		rAudio[i] = fmin( +2, fmax( -2, output[i*nChannels+1] ) );
+	if( showAudio ){
+		for( int i = 0; i < 256; i++ ){
+			lAudio[i] = fmin( +2, fmax( -2, output[i*nChannels] ) );
+			rAudio[i] = fmin( +2, fmax( -2, output[i*nChannels+1] ) );
+		}
 	}
-
 	/*if( toConsole ){
 		cout << "-----------------------" << endl;
 		for( int i = 0; i < 256; i++ ){
@@ -976,7 +989,33 @@ void testApp::moveRecorder( pointRecorder * rec, int dx, int dy, bool moveKids )
 	}
 }
 
-
+// ------------------------
+void testApp::cleanup(){
+	// remove all dead recorders from the selection
+	vector<pointRecorder *>::iterator pr = selection.begin();
+	while( pr != selection.end() ){
+		if( (*pr)->startTime == 0 ){
+			pr = selection.erase( pr ); 
+		}
+		else{
+			pr++; 
+		}
+	}
+	
+	// remove all dead recorders from all patterns
+	for( int i = 0; i < 12; i++ ){
+		// remove all dead recorders from the selection
+		vector<pointRecorder *>::iterator pr = sets[i].begin();
+		while( pr != sets[i].end() ){
+			if( (*pr)->startTime == 0 ){
+				pr = sets[i].erase( pr ); 
+			}
+			else{
+				pr++; 
+			}
+		}
+	}
+}
 
 // ------------------------
 void testApp::save(){

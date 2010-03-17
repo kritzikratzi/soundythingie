@@ -51,6 +51,9 @@ class pointRecorder {
 		vector <pointRecorder*> babysitting; // If this line is the parent of another line we store that other line here (who's being babysitted?)
 		pointRecorder * babysitter; // If a line is being parented by another line we store that other line here (who's the babysitter?)
 		
+		// if being babysitted it is interresting to remember how far away from 
+		// the original line we are! 
+		float babysitterX, babysitterY; 
 		
 		int offsetX; 
 		int offsetY; 

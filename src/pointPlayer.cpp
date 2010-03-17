@@ -65,8 +65,6 @@ void pointPlayer::update(){
 		if( !this->pr->bAmRecording && timeCounter >= this->pr->getDuration() ){
 			// kill myself? 
 			suicide = true; 
-			cout << "DIE OF OTHER THINGS!" << endl; 
-			cout << this->pr->bAmRecording << endl; 
 		}
 		else{
 			doCrazyMath( false ); 

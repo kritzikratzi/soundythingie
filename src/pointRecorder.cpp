@@ -83,6 +83,8 @@ void pointRecorder::reset( int beatMod ) {
 	startDelay = 0; 
 	startTime = 0; 
 	enabled = true; 
+	babysitterX	= 0; 
+	babysitterY	= 0; 
 	
 	pts.clear();
 	kids.clear(); 
@@ -107,6 +109,8 @@ float pointRecorder::getDuration() {
 
 //------------------------------------------------------------------
 void pointRecorder::applyOffset(){
+	if( offsetX == 0 && offsetY == 0 ) return; 
+	
 	for( int i = 0; i < pts.size(); i++ ){
 		pts[i].pos.x += offsetX; 
 		pts[i].pos.y += offsetY; 
@@ -251,6 +255,8 @@ void pointRecorder::save( ofstream& out ){
 	out << "triggerAlways:" << triggerAlways << endl;
 	out << "startDelay:" << startDelay << endl; 
 	out << "babysitter:" << (babysitter==NULL?-1:(babysitter->index)) << endl; 
+	out << "babysitterX:" << babysitterX << endl; 
+	out << "babysitterY:" << babysitterY << endl; 
 	
 	out << "timePt:"; 
 	for( int i = 0; i < pts.size(); i++ ){
@@ -311,6 +317,8 @@ void pointRecorder::load( ifstream& in, pointRecorder recorders[], pointPlayer p
 				babysitter = &recorders[i]; 
 			}
 		}
+		if( 0 == strcmp( cmd, "babysitterX" ) ) in >> babysitterX; 
+		if( 0 == strcmp( cmd, "babysitterY" ) ) in >> babysitterY; 
 		
 		if( 0 == strcmp( cmd, "timePt" ) ){
 			float t; 
