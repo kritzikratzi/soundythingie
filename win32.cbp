@@ -109,6 +109,8 @@
 		</ExtraCommands>
 		<Unit filename="src\Helpers.cpp" />
 		<Unit filename="src\Helpers.h" />
+		<Unit filename="src\ImageButton.cpp" />
+		<Unit filename="src\ImageButton.h" />
 		<Unit filename="src\Tones.cpp" />
 		<Unit filename="src\Tones.h" />
 		<Unit filename="src\main.cpp" />
