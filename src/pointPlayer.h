@@ -34,7 +34,6 @@ class pointPlayer{
 		float 	phaseAdderTarget;
 		float	timeCounter;
 		float	timeOfLastFrame;
-		float 	volume;
 		float	amplitude; 
 		float	amplitudeTarget; 
 		float 	pan;

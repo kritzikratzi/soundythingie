@@ -55,7 +55,7 @@ class testApp : public ofSimpleApp{
 		// yey- and here come some annoying helper functions! 
 		// when you don't know what you're doing always use these
 		// instead of setting the variables directly! 
-		void clear(); 
+		void clear( bool hard = false ); 
 		void save();
 		void load();
 		void setBeatMod( int mod ); 
@@ -74,20 +74,11 @@ class testApp : public ofSimpleApp{
 		// --------------- for the audio
 		void audioRequested(float * input, int bufferSize, int nChannels);
 
-		float 	pan;
 		int		sampleRate;
-		bool 	bNoise;
-		float 	volume;
 
 		float 	lAudio[256];
 		float   rAudio[256];
 		bool	showAudio;
-
-		//------------------- for the simple sine wave synthesis
-		float 	targetFrequency;
-		float 	phase;
-		float 	phaseAdder;
-		float 	phaseAdderTarget;
 
 		pointRecorder recorders[200];
 		pointPlayer players[200];

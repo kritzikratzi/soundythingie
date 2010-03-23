@@ -10,25 +10,32 @@ FEATURES:
 - when curve is delete remove it along with the last runner
 - make runners friendlier? 
 - kids spawn off with the beat-subdivision that is selected (e.g. 0=1-> every single one, 2->every second one, etc.) 
-- allow lines to move while drawing the babysitter, this will make it much more understandable!!
+- allow lines to move while drawing the babysitter, this might make it much more understandable!!
 - maybe, instead of changing volume the ability to 
   use a key to quickly duplicate a line
   (with some x offset, or some random position around the original, 
    also the line could be randomized to be a bit funkier) 
 - show regions of f1-f12 keys (remember the selection, or something 
   like that)
+- do not change hover node when mouse wasn't moved. it's fucking confusing me the way it is now! 
+
 
 BUGS: 
 
-- saving/loading when fullscreen
++ saving/loading when fullscreen
 - wave forms are not correct right now, 
   sin is chopped, 
   rect+triangle seem too high. 
-- sometimes when dragging lines get distorted
-
-
+  
 DONE: 
 
++ the "c" button doesn't yet call the cleanup method! 
+  (so eventually there's problems with the patterns too)
++ babysittingX/Y is not reset when babysitter is deleted
++ babysitter/babysitting are not always correctly deleted
++ draw a line. draw a babysitter. remove the line. 
+  draw a babysitter for the original babysitter. 
+  madness all around! 
 + make lines deletable
 + allow changing volume (use +/- keys)
 + hook things up to beats
@@ -53,6 +60,7 @@ DONE:
 
 MAYBE LATER: (=not gonna happen)
 
+- sometimes when dragging lines get distorted
 - when hovering over a potential spawn allow pressing "alt" to draw anywhere
 - drag to any edge to delete
 - use l ("link"), to link the beat directly to the generated beat, 

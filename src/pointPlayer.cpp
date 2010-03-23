@@ -26,7 +26,6 @@ pointPlayer::pointPlayer(){
 void pointPlayer::setup( pointRecorder * pr ){
 	this->pr = pr; 
 	//volume				= 0.1f;
-	volume = pr->volume; 
 	pan					= 0.5f;
 	sampleRate 			= 44100;
 	timeCounter			= 0; 
@@ -74,7 +73,6 @@ void pointPlayer::update(){
 		// DIE BECAUSE OF UNEMPLOYMENT!
 		cout << "DIE OF UNEMPLOYMENT" << endl; 
 		suicide = true; 
-		volume = 0;
 		amplitude = 0; 
 		targetFrequency = 100;
 		phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
@@ -142,15 +140,11 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		else if( pan < panTarget ) pan += 0.0001; 
 		else if( pan > panTarget ) pan -= 0.0001; 
 		
-		/*     if( fabs( phaseAdder - phaseAdderTarget ) < 0.00001 ) ; 
-		else if( phaseAdder < phaseAdderTarget ) phaseAdder += 0.00001; 
-		else if( phaseAdder > phaseAdderTarget ) phaseAdder -= 0.00001; */
 		phaseAdder = phaseAdderTarget*0.001f + phaseAdder*0.999f; 
 		
 		leftScale = 1-pan; 
 		rightScale = pan; 
 		
-		//phaseAdder = 0.99f * phaseAdder + 0.01f * phaseAdderTarget;
 		if( useEnvelope && this->pr->bAmRecording == false ){
 			float actualTime = timeCounter + samplesSinceUpdate*bufferSize/44100.0 + i/44100.0;
 			
@@ -169,9 +163,6 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		phase += phaseAdder;
 		phase = fmod( phase, TWO_PI ); 
 
-		/*if( fabs( amplitude - amplitudeTarget ) < 0.00001 ) ; //nothing happens! 
-		else if( amplitude < amplitudeTarget ) amplitude += 0.00001; 
-		else if( amplitude > amplitudeTarget ) amplitude -= 0.00001; */
 		amplitude = amplitudeTarget*0.001f + amplitude*0.999f; 
 		
 		if( fabs( envelopeScale - envelopeScaleTarget) < 0.001 ) ; //nothing happens! 
@@ -180,8 +171,8 @@ void pointPlayer::audioRequested(float * output, int bufferSize, int nChannels, 
 		
 		
 		float sample = shapeFunc(phase);
-		output[i*nChannels    ] += sample * amplitude * (volume*10) * leftScale  * envelopeScale;
-		output[i*nChannels + 1] += sample * amplitude * (volume*10) * rightScale * envelopeScale;
+		output[i*nChannels    ] += sample * amplitude * (pr->volume*10) * leftScale  * envelopeScale;
+		output[i*nChannels + 1] += sample * amplitude * (pr->volume*10) * rightScale * envelopeScale;
 	}
 	
 	

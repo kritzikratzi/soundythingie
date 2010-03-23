@@ -25,21 +25,14 @@ void testApp::setup(){
 	// 44100 samples per second
 	// 256 samples per buffer
 	// 4 num buffers (latency)
-
 	sampleRate 			= 44100;
-	phase 				= 0;
-	phaseAdder 			= 0.1f;
-	phaseAdderTarget 	= 0.0f;
-	volume				= 0.1f;
-	pan					= 0.5f;
-	bNoise 				= false;
+	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 
 	showAudio = false;
 
 	spawnFocusPoint = -1;
 	spawnFocusRecorder = -1;
 
-	ofSoundStreamSetup(2,0,this, sampleRate,256, 4);
 	hovering = NULL;
 	recording = NULL;
 	beatMod = 1;
@@ -789,7 +782,11 @@ void testApp::mousePressed(int x, int y, int button){
 
 	// start recording!
 	for( int i = 0; i < RECORDERS; i++ ){
-		if( recorders[i].startTime == 0 ){
+		if( recorders[i].startTime == 0 && playersOfRecorders[i].size() == 0 && 
+		    // and the crazy case: a babysitter still holds this thing! 
+		   // this is not a perfect fix, but it helps! 
+		    ( recorders[i].babysitter == NULL || playersOfRecorders[recorders[i].babysitter->index].size() == 0 )
+		){
 			recording = &recorders[i];
 			recording->reset( this->beatMod );
 			recording->startTime = ofGetSystemTime(); 
@@ -810,6 +807,8 @@ void testApp::mousePressed(int x, int y, int button){
 				recording->babysitting.push_back( hovering );
 				recording->triggerAlways = false;
 				hovering->babysitter = recording;
+				hovering->babysitterX = 0; 
+				hovering->babysitterY = 0; 
 				// also add all other selected nodes. this should be fun! 
 				for( vector<pointRecorder *>::iterator pr = selection.begin(); pr != selection.end(); ++pr ){
 					if( (*pr) != hovering ){
@@ -820,12 +819,6 @@ void testApp::mousePressed(int x, int y, int button){
 					}
 				}
 				
-			}
-
-			// no one's spawn (parenting or normal)
-			// and on a classic beat
-			if( spawnFocusRecorder < 0 && beatMod > 0 ){
-				recording->startDelay = ofGetElapsedTimef() - bpmLastTriggered[beatMod];
 			}
 			
 			return;
@@ -883,22 +876,7 @@ void testApp::mouseReleased(){
 //--------------------------------------------------------------
 void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 
-	float leftScale = 1 - pan;
-	float rightScale = pan;
-
-	// sin (n) seems to have trouble when n is very large, so we
-	// keep phase in the range of 0-TWO_PI like this:
-	while (phase > TWO_PI){
-		phase -= TWO_PI;
-	}
-
-	phaseAdder = 0.95f * phaseAdder + 0.05f * phaseAdderTarget;
-
 	for (int i = 0; i < bufferSize; i++){
-			//phase += phaseAdder;
-			//float sample = sin(phase);
-		//output[i*nChannels    ] = sample * volume * leftScale;
-		//output[i*nChannels + 1] = sample * volume * rightScale;
 		output[i*nChannels    ] = 0;
 		output[i*nChannels + 1] = 0;
 	}
@@ -911,11 +889,6 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 				for (vector<pointRecorder *>::iterator pr = vec->begin(); pr != vec->end(); ++pr ){
 					this->moveRecorder( *pr, targetPos->x-(*pr)->pts[0].pos.x+(*pr)->babysitterX, targetPos->y-(*pr)->pts[0].pos.y+(*pr)->babysitterY, true );
 				}
-
-				for( int i =0; i < RECORDERS; i++ ){
-					if( recorders[i].active() )
-						recorders[i].applyOffset();
-				}
 			}
 			else{
 				players[i].audioRequested( output, bufferSize, nChannels, useEnvelope );
@@ -923,6 +896,11 @@ void testApp::audioRequested(float * output, int bufferSize, int nChannels){
 		}
 	}
 
+	for( int i =0; i < RECORDERS; i++ ){
+		if( recorders[i].active() )
+			recorders[i].applyOffset();
+	}
+	
 	if( showAudio ){
 		for( int i = 0; i < 256; i++ ){
 			lAudio[i] = fmin( +2, fmax( -2, output[i*nChannels] ) );
@@ -960,6 +938,13 @@ void testApp::deleteRecorder( pointRecorder * rec ){
 					pr->kids.erase( pr->kids.begin()+j );
 					pr->kidPointNr.erase( pr->kidPointNr.begin()+j );
 					j--;
+				}
+			}
+			// also remove all references where this line was babysitted! 
+			for( int j = 0; j < pr->babysitting.size(); j++ ){
+				if( pr->babysitting[j] == rec ){
+					pr->babysitting.erase( pr->babysitting.begin()+j ); 
+					j--; 
 				}
 			}
 		}
@@ -1202,14 +1187,32 @@ void testApp::load(){
 }
 
 
-void testApp::clear(){
+void testApp::clear( bool hard ){
 	newBtn.activated(); 
 	
 	for( int i = 0; i < RECORDERS; i++ ){
-		//recorders[i].clear();
+		if( hard ) recorders[i].reset( 0 ); 
 		recorders[i].startTime = 0;
-		//players[i].suicide = true;
 	}
+	
+	if( hard ){
+		for( int i = 0; i < PLAYERS; i++ ){
+			players[i].suicide = true; 
+			players[i].dead = true; 
+		}
+	}
+	
+	for( int i = 0; i < 12; i++ ){
+		sets[i].clear();
+	}
+	
+	
+	hovering = NULL; 
+	spawnFocusPoint = -1;
+	spawnFocusRecorder = -1;	
+	
+	
+	cleanup(); 
 }
 
 
@@ -1241,13 +1244,8 @@ bool testApp::save( string filename ){
 bool testApp::load( string filename ){
 	ifstream in( filename.c_str(), ios::in );
 
-	// Reset EVERYTHING!
-	for( int i = 0; i < RECORDERS; i++ ){
-		recorders[i].reset( 0 );
-	}
-	for( int i = 0; i < 12; i++ ){
-		sets[i].clear();
-	}
+	// hard reset! 
+	clear( true ); 
 
 	char cmd[64];
 

@@ -80,7 +80,6 @@ void pointRecorder::reset( int beatMod ) {
 	offsetY = 0; 
 	bAmRecording = true;
 	volume = 0.1f;
-	startDelay = 0; 
 	startTime = 0; 
 	enabled = true; 
 	babysitterX	= 0; 
@@ -253,7 +252,6 @@ void pointRecorder::save( ofstream& out ){
 	out << "soundShape:" << soundShape << endl; 
 	out << "enabled:" << enabled << endl; 
 	out << "triggerAlways:" << triggerAlways << endl;
-	out << "startDelay:" << startDelay << endl; 
 	out << "babysitter:" << (babysitter==NULL?-1:(babysitter->index)) << endl; 
 	out << "babysitterX:" << babysitterX << endl; 
 	out << "babysitterY:" << babysitterY << endl; 
@@ -307,7 +305,6 @@ void pointRecorder::load( ifstream& in, pointRecorder recorders[], pointPlayer p
 		if( 0 == strcmp( cmd, "soundShape" ) ) in >> soundShape; 
 		if( 0 == strcmp( cmd, "enabled" ) ) in >> enabled; 
 		if( 0 == strcmp( cmd, "triggerAlways" ) ) in >> triggerAlways; 
-		if( 0 == strcmp( cmd, "startDelay" ) ) in >> startDelay; 
 		if( 0 == strcmp( cmd, "babysitter" ) ){
 			int i; in >> i; 
 			if( i == -1 ){
